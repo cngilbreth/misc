@@ -1,16 +1,26 @@
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
+# Customized by CG
 
 # If not running interactively, don't do anything
 #[ -z "$PS1" ] && return
 
+################################################################################
+# Bash history
+################################################################################
+
 # don't put duplicate lines in the history. See bash(1) for more options
 export HISTCONTROL=ignoredups
 
-# check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
-shopt -s checkwinsize
+
+# configure the BASH history features.
+# Notes: typing ctrl-r will give backward incremental search
+#        typing history | grep blah will search the history for blah
+#        typing !123   will execute history command 123
+#        typing !s<enter> will execute the last command starting with s.
+export HISTIGNORE="&:ls:[bf]g:exit:ls -l: ls -la"
+
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
@@ -19,6 +29,14 @@ shopt -s checkwinsize
 if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
+
+################################################################################
+# Colors, prompt and xterm
+################################################################################
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
 
 # set a fancy prompt (non-color, unless we know we "want" color)
 # case "$TERM" in
@@ -42,7 +60,23 @@ xterm*|rxvt*)
     ;;
 esac
 
+# enable color support of ls and also add handy aliases
+if [ "$TERM" != "dumb" ]; then
+    test ! -z `which dircolors` && eval "`dircolors -b`"
+    #alias ls='ls --color=auto'
+    # Have ls use colors.
+    export CLICOLOR=1
+    alias ls='ls -a'
+
+    #alias dir='ls --color=auto --format=vertical'
+    #alias vdir='ls --color=auto --format=long'
+fi
+
+
+################################################################################
 # Alias definitions.
+################################################################################
+
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
@@ -51,14 +85,7 @@ esac
 #    . ~/.bash_aliases
 #fi
 
-# enable color support of ls and also add handy aliases
-if [ "$TERM" != "dumb" ]; then
-    eval "`dircolors -b`"
-    alias ls='ls --color=auto'
-    #alias dir='ls --color=auto --format=vertical'
-    #alias vdir='ls --color=auto --format=long'
-fi
-
+alias mv="mv -i"
 
 # some more ls aliases
 #alias ll='ls -l'
@@ -69,13 +96,16 @@ fi
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
 
-# CG: The following statement is seems to fuck up the script.
+# CG: The following statement is seems to mess up the script.
 # Nothing gets exececuted after this. Commented out.
 #if [ -f /etc/bash_completion ]; then
 #    source /etc/bash_completion
 #fi
 
-# set PATH so it includes user's private bin if it exists
+
+################################################################################
+# PATHS
+################################################################################
 
 if [ -d $HOME/local/bin ] ; then
     PATH="$HOME/local/bin:${PATH}"
@@ -89,18 +119,25 @@ if [ -d $HOME/Projects/mn-tm/tools ] ; then
     PATH="$HOME/Projects/mn-tm/tools:$PATH"
 fi
 
-# configure the BASH history features.
-# Notes: typing ctrl-r will give backward incremental search
-#        typing history | grep blah will search the history for blah
-#        typing !123   will execute history command 123
-#        typing !s<enter> will execute the last command starting with s.
-export HISTIGNORE="&:ls:[bf]g:exit:ls -l: ls -la"
+
+# set PYTHONPATH to include my stuff
+if [ -d $HOME/Projects/cg_pylib ] ; then
+    PYTHONPATH="$PYTHONPATH:~/Projects/cg_pylib"
+fi
+
+test -r /sw/bin/init.sh && . /sw/bin/init.sh
+
+################################################################################
+# Intel Fortran Compiler stuff
+################################################################################
+
+test -r /usr/local/intel/fc/10.1.008/bin/ifortvars.sh && \
+    . /usr/local/intel/fc/10.1.008/bin/ifortvars.sh
+
+test -r /usr/local/intel/idb/10.1.008/bin/idbvars.sh && \
+    . /usr/local/intel/idb/10.1.008/bin/idbvars.sh
+
 export PATH
+export PYTHONPATH
 
-alias mv="mv -i"
 xset b off
-
-GIT_EDITOR=/etc/alternatives/emacs22
-EDITOR=/etc/alternativces/emacs22
-VISUAL=/etc/alternatives/emacs22
-export GIT_EDITOR EDITOR VISUAL

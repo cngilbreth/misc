@@ -1,12 +1,22 @@
 #!/bin/bash
 # backup.sh -- backup directories to remote storage
 
-#SOURCES="/Users/cng8/bin /Users/cng8/Documents /Users/cng8/.Xmodmap"
-#VAULT="macbook"
+HOST=`hostname`
 
-SOURCES="/home/posco/Desktop /home/posco/bin /home/posco/Projects /home/posco/Documents \
-/home/posco/.TeXmacs /home/posco/.emacs /home/posco/.bashrc /home/posco/.bash_profile"
-VAULT="autumn"
+if [ "$HOST" == "Physics-06-15" ]
+then
+    SOURCES="/Users/cng8/bin /Users/cng8/Documents /Users/cng8/.Xmodmap"
+    VAULT="macbook"
+elif [ "$HOST" == "Autumn" ]
+then
+    SOURCES="/home/posco/Desktop /home/posco/bin /home/posco/Projects \
+/home/posco/Documents /home/posco/.TeXmacs /home/posco/.emacs \
+/home/posco/.bashrc /home/posco/.bash_profile"
+    VAULT="autumn"
+else
+    echo "No configuration found for this host."
+    exit 1
+fi
 
 REMOTE_PATH="8156@usw-s008.rsync.net:/data2/home/8156/backups"
 
