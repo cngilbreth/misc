@@ -145,10 +145,10 @@
    '(recentf-max-menu-items 20)
    '(blink-cursor-mode nil)
    '(fill-column 80)
-   '(one-buffer-one-frame-mode nil nil (aquamacs-frame-setup))
    '(scheme-program-name "guile-1.6")
    '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
-   '(transient-mark-mode t)))
+   '(transient-mark-mode t)
+   '(default ((t (:stipple nil :background "#ffffff" :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 120 :width normal :family "terminus"))))))
 
 
 (when window-system
@@ -172,4 +172,5 @@
    '(font-lock-type-face ((((class color) (min-colors 88) (background light)) (:underline "grey50" :weight bold))))
    '(font-lock-variable-name-face ((((class color) (min-colors 88) (background light)) (:foreground "DarkGoldenrod4" :weight bold))))
    '(mode-line ((t (:background "#f6f6f6" :foreground "grey30" :box (:line-width 1 :color "grey50")))))
-   '(mode-line-inactive ((default (:inherit mode-line)) (((class color) (min-colors 88) (background light)) nil)))))
+   '(mode-line-inactive ((default (:inherit mode-line)) (((class color) (min-colors 88) (background light)) nil)))
+   '(region ((((class color) (min-colors 88) (background light)) (:background "lavender"))))))
