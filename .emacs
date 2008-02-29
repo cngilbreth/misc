@@ -115,42 +115,61 @@
 ;; customize
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(string= (system-name) "Physics-06-15")
+
+(when (string= (system-name) "Physics-06-15")
+  (custom-set-variables
+   ;; custom-set-variables was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(recentf-max-menu-items 20)
+   '(blink-cursor-mode nil)
+   '(fill-column 80)
+   '(one-buffer-one-frame-mode nil nil (aquamacs-frame-setup))
+   '(scheme-program-name "guile-1.6")
+   '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
+   '(transient-mark-mode t))
+  '(aquamacs-additional-fontsets nil t)
+  '(aquamacs-customization-version-id 100 t)
+  '(aquamacs-default-styles (quote ((default (color-theme color-theme-snapshot)
+				      (font . "-apple-monaco-medium-r-normal--12-0-72-72-m-0-iso10646-1") (tool-bar-lines . 0))))))
 
 
-(custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(aquamacs-additional-fontsets nil t)
- '(aquamacs-customization-version-id 100 t)
- '(aquamacs-default-styles (quote ((default (color-theme color-theme-snapshot) (font . "-apple-monaco-medium-r-normal--12-0-72-72-m-0-iso10646-1") (tool-bar-lines . 0)))))
- '(blink-cursor-mode nil)
- '(fill-column 80)
- '(one-buffer-one-frame-mode nil nil (aquamacs-frame-setup))
- '(scheme-program-name "guile-1.6")
- '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
- '(transient-mark-mode t))
+(when (string= (system-name) "Autumn")
+  (custom-set-variables
+   ;; custom-set-variables was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(recentf-max-menu-items 20)
+   '(blink-cursor-mode nil)
+   '(fill-column 80)
+   '(one-buffer-one-frame-mode nil nil (aquamacs-frame-setup))
+   '(scheme-program-name "guile-1.6")
+   '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
+   '(transient-mark-mode t)))
+
 
 (when window-system
-(custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(default ((t (:stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil \.\.\.))))
- '(font-lock-builtin-face ((((class color) (min-colors 88) (background light)) (:underline t :weight bold))))
- '(font-lock-comment-delimiter-face ((default (:inherit font-lock-comment-face :weight bold)) (((class color) (min-colors 16)) nil)))
- '(font-lock-comment-face ((t (:foreground "bisque4" :slant italic))))
- '(font-lock-constant-face ((((class color) (min-colors 88) (background light)) (:foreground "DarkCyan"))))
- '(font-lock-doc-face ((t (:inherit font-lock-string-face))))
- '(font-lock-function-name-face ((((class color) (min-colors 88) (background light)) (:box (:line-width 1 :color "grey50") :weight bold))))
- '(font-lock-keyword-face ((t (:foreground "DarkBlue" :weight bold))))
- '(font-lock-negation-char-face ((t (:foreground "DarkRed"))))
- '(font-lock-regexp-grouping-backslash ((t (:inherit bold :foreground "DarkCyan"))))
- '(font-lock-regexp-grouping-construct ((t (:inherit bold :foreground "DarkCyan"))))
- '(font-lock-string-face ((((class color) (min-colors 88) (background light)) (:background "LightYellow1" :foreground "grey30"))))
- '(font-lock-type-face ((((class color) (min-colors 88) (background light)) (:underline "grey50" :weight bold))))
- '(font-lock-variable-name-face ((((class color) (min-colors 88) (background light)) (:foreground "DarkGoldenrod4" :weight bold))))
- '(mode-line ((t (:background "#f6f6f6" :foreground "grey30" :box (:line-width 1 :color "grey50")))))
- '(mode-line-inactive ((default (:inherit mode-line)) (((class color) (min-colors 88) (background light)) nil)))))
+  (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(default ((t (:stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil \.\.\.))))
+   '(font-lock-builtin-face ((((class color) (min-colors 88) (background light)) (:underline t :weight bold))))
+   '(font-lock-comment-delimiter-face ((default (:inherit font-lock-comment-face :weight bold)) (((class color) (min-colors 16)) nil)))
+   '(font-lock-comment-face ((t (:foreground "bisque4" :slant italic))))
+   '(font-lock-constant-face ((((class color) (min-colors 88) (background light)) (:foreground "DarkCyan"))))
+   '(font-lock-doc-face ((t (:inherit font-lock-string-face))))
+   '(font-lock-function-name-face ((((class color) (min-colors 88) (background light)) (:box (:line-width 1 :color "grey50") :weight bold))))
+   '(font-lock-keyword-face ((t (:foreground "DarkBlue" :weight bold))))
+   '(font-lock-negation-char-face ((t (:foreground "DarkRed"))))
+   '(font-lock-regexp-grouping-backslash ((t (:inherit bold :foreground "DarkCyan"))))
+   '(font-lock-regexp-grouping-construct ((t (:inherit bold :foreground "DarkCyan"))))
+   '(font-lock-string-face ((((class color) (min-colors 88) (background light)) (:background "LightYellow1" :foreground "grey30"))))
+   '(font-lock-type-face ((((class color) (min-colors 88) (background light)) (:underline "grey50" :weight bold))))
+   '(font-lock-variable-name-face ((((class color) (min-colors 88) (background light)) (:foreground "DarkGoldenrod4" :weight bold))))
+   '(mode-line ((t (:background "#f6f6f6" :foreground "grey30" :box (:line-width 1 :color "grey50")))))
+   '(mode-line-inactive ((default (:inherit mode-line)) (((class color) (min-colors 88) (background light)) nil)))))

@@ -10,9 +10,6 @@ if [ -f ~/.bashrc ]; then
     . ~/.bashrc
 fi
 
-# Have ls use colors.
-export CLICOLOR=1
-alias ls='ls -a'
 
 
 ################################################################################
@@ -45,7 +42,8 @@ CyanBG="$(tput setab 6)"
 LightCyan="$(tput bold ; tput setaf 6)"
 NC="$(tput sgr0)" # No Color
 
-
+# export PS1="$Cyan\u@\h $NC$Blue\W/$ $NC"
+#export PS1="$NC$Blue\Wx/$ $NC"
 
 
 
