@@ -1,6 +1,27 @@
 #!/bin/bash
 # backup.sh -- backup directories to remote storage
 
+################################################################################
+# Process command line args
+################################################################################
+
+REMOVE=0
+
+if [ "$1" == "remove" ]
+then
+    REMOVE=1
+elif [ $# -gt 0 ]
+then
+    echo "Unknown command line arguments."
+    exit 1
+fi
+
+
+################################################################################
+# Set up hostname, sources, etc.
+# Insert machine-specific config here.
+################################################################################
+
 HOST=`hostname`
 
 if [ "$HOST" == "Physics-06-15" ]
@@ -20,6 +41,11 @@ fi
 
 REMOTE_PATH="8156@usw-s008.rsync.net:/data2/home/8156/backups"
 
+
+################################################################################
+# Backup or remove the extras
+################################################################################
+
 RBACKUP="`which rbackup.sh`"
 if [ -z $RBACKUP ]
 then
@@ -29,38 +55,57 @@ fi
 
 LOG="$HOME/backup_log.txt"
 
-# Redirect stdout and stderr to file
-exec 3>&2 # save stderr to file descriptor 3
-exec 1>>$LOG # stdout
-exec 2>>$LOG # stderr
+backup()
+{
+    # Redirect stdout and stderr to file
+    exec 3>&2 # save stderr to file descriptor 3
+    exec 1>>$LOG # stdout
+    exec 2>>$LOG # stderr
+    
+    echo "************************************************************"
+    echo "* Backup started: `date`"
+    echo "************************************************************"
+    echo ""
+    
+    echo "Files/directories/globs to backup:"
+    echo $SOURCES
+    
+    # do the backup
+    
+    echo ""
+    echo "Running rbackup.sh..."
+    echo "Running rbackup.sh..." >&3
+    
+    $RBACKUP -v $VAULT $SOURCES $REMOTE_PATH
+    
+    if [ $? -ne 0 ]
+    then
+	result="FAILED"
+	echo "ERROR: rbackup failed. See $LOG for more info." >&3
+    else
+	result="finished"
+	echo "rbackup finished."
+    fi
+    
+    echo "************************************************************"
+    echo "* Backup $result: `date`"
+    echo "************************************************************"
+    echo ""
+}
 
-echo "************************************************************"
-echo "* Backup started: `date`"
-echo "************************************************************"
-echo ""
+remove_extras()
+{
+    rbackup-remove.sh -v $VAULT 6 $REMOTE_PATH
+}
 
-echo "Files/directories/globs to backup:"
-echo $SOURCES
 
-# do the backup
-
-echo ""
-echo "Running rbackup.sh..."
-echo "Running rbackup.sh..." >&3
-
-$RBACKUP -v $VAULT $SOURCES $REMOTE_PATH
-
-if [ $? -ne 0 ]
+if [ $REMOVE -eq 0 ]
 then
-    result="FAILED"
-    echo "ERROR: rbackup failed. See $LOG for more info." >&3
-else
-    result="finished"
-    echo "rbackup finished."
+    backup
+elif [ $REMOVE -eq 1 ]
+then
+    remove_extras
 fi
 
-echo "************************************************************"
-echo "* Backup $result: `date`"
-echo "************************************************************"
-echo ""
 
+    
