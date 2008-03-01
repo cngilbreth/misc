@@ -2,7 +2,7 @@
 ;; interface customizations
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(tool-bar-mode)
+(customize-set-variable 'tool-bar-mode 't)
 (global-font-lock-mode t)
 (mouse-wheel-mode t)
 
@@ -118,11 +118,39 @@
 (string= (system-name) "Physics-06-15")
 
 (when (string= (system-name) "Physics-06-15")
+
+
+  (when window-system
+    (custom-set-faces
+     ;; custom-set-faces was added by Custom.
+     ;; If you edit it by hand, you could mess it up, so be careful.
+     ;; Your init file should contain only one such instance.
+     ;; If there is more than one, they won't work right.
+     '(default ((t (:stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil \.\.\.))))
+     '(font-lock-builtin-face ((((class color) (min-colors 88) (background light)) (:underline t :weight bold))))
+     '(font-lock-comment-delimiter-face ((default (:inherit font-lock-comment-face :weight bold)) (((class color) (min-colors 16)) nil)))
+     '(font-lock-comment-face ((t (:foreground "grey50" :slant italic))))
+     '(font-lock-constant-face ((((class color) (min-colors 88) (background light)) (:foreground "DarkCyan"))))
+     '(font-lock-doc-face ((t (:inherit font-lock-string-face))))
+     '(font-lock-function-name-face ((((class color) (min-colors 88) (background light)) (:box (:line-width 1 :color "grey50") :weight bold))))
+     '(font-lock-keyword-face ((t (:foreground "DarkBlue" :weight bold))))
+     '(font-lock-negation-char-face ((t (:foreground "DarkRed"))))
+     '(font-lock-regexp-grouping-backslash ((t (:inherit bold :foreground "DarkCyan"))))
+     '(font-lock-regexp-grouping-construct ((t (:inherit bold :foreground "DarkCyan"))))
+     '(font-lock-string-face ((((class color) (min-colors 88) (background light)) (:background "LightYellow1" :foreground "grey30"))))
+     '(font-lock-type-face ((((class color) (min-colors 88) (background light)) (:underline "grey50" :weight bold))))
+     '(font-lock-variable-name-face ((((class color) (min-colors 88) (background light)) (:foreground "purple3" :weight bold))))
+     '(mode-line ((t (:background "#f6f6f6" :foreground "grey30" :box (:line-width 1 :color "grey50")))))
+     '(mode-line-inactive ((default (:inherit mode-line)) (((class color) (min-colors 88) (background light)) nil)))
+     '(region ((((class color) (min-colors 88) (background light)) (:background "lavender"))))))
+
+
   (custom-set-variables
    ;; custom-set-variables was added by Custom.
    ;; If you edit it by hand, you could mess it up, so be careful.
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
+   '(tool-bar-mode 't)
    '(recentf-max-menu-items 20)
    '(blink-cursor-mode nil)
    '(fill-column 80)
@@ -137,11 +165,38 @@
 
 
 (when (string= (system-name) "Autumn")
+
+  (when window-system
+    (custom-set-faces
+     ;; custom-set-faces was added by Custom.
+     ;; If you edit it by hand, you could mess it up, so be careful.
+     ;; Your init file should contain only one such instance.
+     ;; If there is more than one, they won't work right.
+     '(default ((t (:stipple nil :background "#ffffff" :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 120 :width normal :family "terminus"))))
+     '(default ((t (:stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil \.\.\.))))
+     '(font-lock-builtin-face ((((class color) (min-colors 88) (background light)) (:underline t :weight bold))))
+     '(font-lock-comment-delimiter-face ((default (:inherit font-lock-comment-face :weight bold)) (((class color) (min-colors 16)) nil)))
+     '(font-lock-comment-face ((t (:foreground "grey50" :slant italic))))
+     '(font-lock-constant-face ((((class color) (min-colors 88) (background light)) (:foreground "DarkCyan"))))
+     '(font-lock-doc-face ((t (:inherit font-lock-string-face))))
+     '(font-lock-function-name-face ((((class color) (min-colors 88) (background light)) (:box (:line-width 1 :color "grey50") :weight bold))))
+     '(font-lock-keyword-face ((t (:foreground "DarkBlue" :weight bold))))
+     '(font-lock-negation-char-face ((t (:foreground "DarkRed"))))
+     '(font-lock-regexp-grouping-backslash ((t (:inherit bold :foreground "DarkCyan"))))
+     '(font-lock-regexp-grouping-construct ((t (:inherit bold :foreground "DarkCyan"))))
+     '(font-lock-string-face ((((class color) (min-colors 88) (background light)) (:background "LightYellow1" :foreground "grey30"))))
+     '(font-lock-type-face ((((class color) (min-colors 88) (background light)) (:underline "grey50" :weight bold))))
+     '(font-lock-variable-name-face ((((class color) (min-colors 88) (background light)) (:foreground "purple3" :weight bold))))
+     '(mode-line ((t (:background "#f6f6f6" :foreground "grey30" :box (:line-width 1 :color "grey50")))))
+     '(mode-line-inactive ((default (:inherit mode-line)) (((class color) (min-colors 88) (background light)) nil)))
+     '(region ((((class color) (min-colors 88) (background light)) (:background "lavender"))))))
+
   (custom-set-variables
    ;; custom-set-variables was added by Custom.
    ;; If you edit it by hand, you could mess it up, so be careful.
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
+   '(tool-bar-mode 't)
    '(recentf-max-menu-items 20)
    '(blink-cursor-mode nil)
    '(fill-column 80)
@@ -151,26 +206,3 @@
    '(default ((t (:stipple nil :background "#ffffff" :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 120 :width normal :family "terminus"))))))
 
 
-(when window-system
-  (custom-set-faces
-   ;; custom-set-faces was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   '(default ((t (:stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil \.\.\.))))
-   '(font-lock-builtin-face ((((class color) (min-colors 88) (background light)) (:underline t :weight bold))))
-   '(font-lock-comment-delimiter-face ((default (:inherit font-lock-comment-face :weight bold)) (((class color) (min-colors 16)) nil)))
-   '(font-lock-comment-face ((t (:foreground "bisque4" :slant italic))))
-   '(font-lock-constant-face ((((class color) (min-colors 88) (background light)) (:foreground "DarkCyan"))))
-   '(font-lock-doc-face ((t (:inherit font-lock-string-face))))
-   '(font-lock-function-name-face ((((class color) (min-colors 88) (background light)) (:box (:line-width 1 :color "grey50") :weight bold))))
-   '(font-lock-keyword-face ((t (:foreground "DarkBlue" :weight bold))))
-   '(font-lock-negation-char-face ((t (:foreground "DarkRed"))))
-   '(font-lock-regexp-grouping-backslash ((t (:inherit bold :foreground "DarkCyan"))))
-   '(font-lock-regexp-grouping-construct ((t (:inherit bold :foreground "DarkCyan"))))
-   '(font-lock-string-face ((((class color) (min-colors 88) (background light)) (:background "LightYellow1" :foreground "grey30"))))
-   '(font-lock-type-face ((((class color) (min-colors 88) (background light)) (:underline "grey50" :weight bold))))
-   '(font-lock-variable-name-face ((((class color) (min-colors 88) (background light)) (:foreground "DarkGoldenrod4" :weight bold))))
-   '(mode-line ((t (:background "#f6f6f6" :foreground "grey30" :box (:line-width 1 :color "grey50")))))
-   '(mode-line-inactive ((default (:inherit mode-line)) (((class color) (min-colors 88) (background light)) nil)))
-   '(region ((((class color) (min-colors 88) (background light)) (:background "lavender"))))))

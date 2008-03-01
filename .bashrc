@@ -63,10 +63,12 @@ esac
 # enable color support of ls and also add handy aliases
 if [ "$TERM" != "dumb" ]; then
     test ! -z `which dircolors` && eval "`dircolors -b`"
-    #alias ls='ls --color=auto'
-    # Have ls use colors.
-    export CLICOLOR=1
-    alias ls='ls -a'
+    if [ "`uname`" == "Linux" ]; then
+	alias ls='ls --color=auto -a'
+    elif [ "`uname`" == "Darwin" ]; then
+	export CLICOLOR=1
+	alias ls='ls -a'
+    fi
 
     #alias dir='ls --color=auto --format=vertical'
     #alias vdir='ls --color=auto --format=long'
