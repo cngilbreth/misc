@@ -149,12 +149,11 @@ line=""
 	if [ "$ans" == "y" ]
 	then
 	    echo "Deleting..."
-	    #ssh $DESTHOST rm -rf $BACKDIR/$VAULT/$line
+	    # </dev/null required to keep ssh from grabbing input from the file
+	    ssh $DESTHOST "rm -rf $BACKDIR/$VAULT/$line" </dev/null
 	    if [ $? -ne 0 ]
 	    then
 		echo "ERROR deleting $BACKDIR/$VAULT/$line !!"
-		echo "Exiting."
-		exit 1
 	    fi
 	else
 	    echo "Skipping..."
