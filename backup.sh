@@ -5,11 +5,14 @@
 # Process command line args
 ################################################################################
 
-REMOVE=0
+ACTION="backup"
 
 if [ "$1" == "remove" ]
 then
-    REMOVE=1
+    ACTION="remove"
+elif [ "$1" == "quota" ]
+then
+    ACTION="quota"
 elif [ $# -gt 0 ]
 then
     echo "Unknown command line arguments."
@@ -39,7 +42,11 @@ else
     exit 1
 fi
 
-REMOTE_PATH="8156@usw-s008.rsync.net:/data2/home/8156/backups"
+REMOTE_USER="8156"
+REMOTE_HOST="usw-s008.rsync.net"
+REMOTE_PATH="/data2/home/8156/backups"
+REMOTE_DEST="$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH"
+# e.g. me@backup-site.net:/home/mybackups
 
 
 ################################################################################
@@ -76,7 +83,7 @@ backup()
     echo "Running rbackup.sh..."
     echo "Running rbackup.sh..." >&3
     
-    $RBACKUP -v $VAULT $SOURCES $REMOTE_PATH
+    $RBACKUP -v $VAULT $SOURCES $REMOTE_DEST
     
     if [ $? -ne 0 ]
     then
@@ -95,16 +102,19 @@ backup()
 
 remove_extras()
 {
-    rbackup-remove.sh -v $VAULT 6 $REMOTE_PATH
+    rbackup-remove.sh -v $VAULT 6 $REMOTE_DEST
 }
 
 
-if [ $REMOVE -eq 0 ]
+if [ "$ACTION" == "backup" ]
 then
     backup
-elif [ $REMOVE -eq 1 ]
+elif [ "$ACTION" == "remove" ]
 then
     remove_extras
+elif [ "$ACTION" == "quota" ]
+then
+    ssh "$REMOTE_USER@$REMOTE_HOST" quota
 fi
 
 
