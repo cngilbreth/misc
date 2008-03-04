@@ -124,7 +124,7 @@ fi
 
 # set PYTHONPATH to include my stuff
 if [ -d $HOME/Projects/cg_pylib ] ; then
-    PYTHONPATH="$PYTHONPATH:~/Projects/cg_pylib"
+    PYTHONPATH="$PYTHONPATH:$HOME/Projects/cg_pylib"
 fi
 
 test -r /sw/bin/init.sh && . /sw/bin/init.sh

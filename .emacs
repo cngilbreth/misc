@@ -142,7 +142,7 @@
      '(font-lock-variable-name-face ((((class color) (min-colors 88) (background light)) (:foreground "#1E3149"))))
      '(mode-line ((t (:background "#f6f6f6" :foreground "grey30" :box (:line-width 1 :color "grey50")))))
      '(mode-line-inactive ((default (:inherit mode-line)) (((class color) (min-colors 88) (background light)) nil)))
-     '(region ((((class color) (min-colors 88) (background light)) (:background "lavender"))))))
+     '(region ((((class color) (min-colors 88) (background light)) (:background "#BDD5FC"))))))
   
   (custom-set-variables
    ;; custom-set-variables was added by Custom.
@@ -189,7 +189,7 @@
      '(font-lock-variable-name-face ((((class color) (min-colors 88) (background light)) (:foreground "#1E3149"))))
      '(mode-line ((t (:background "#f6f6f6" :foreground "grey30" :box (:line-width 1 :color "grey50")))))
      '(mode-line-inactive ((default (:inherit mode-line)) (((class color) (min-colors 88) (background light)) nil)))
-     '(region ((((class color) (min-colors 88) (background light)) (:background "lavender"))))))
+     '(region ((((class color) (min-colors 88) (background light)) (:background "#BDD5FC"))))))
 
   (custom-set-variables
    ;; custom-set-variables was added by Custom.
@@ -204,4 +204,3 @@
    '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
    '(transient-mark-mode t)
    '(default ((t (:stipple nil :background "#ffffff" :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 120 :width normal :family "terminus"))))))
-
