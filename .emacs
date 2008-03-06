@@ -112,6 +112,7 @@
 (global-set-key (kbd "C-<down>") 'my-forward-lines)
 (global-set-key (kbd "C-<up>") 'my-backward-lines)
 
+(global-set-key (kbd "C-x C-a") 'recentf-open-files)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; imenu 
