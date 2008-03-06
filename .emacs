@@ -12,7 +12,7 @@
 ;;         sftp doesn't seem to work.
 ;;
 ;; Dired:
-;; 
+;;
 ;;     ? for mini help
 ;;     h for help
 ;;
@@ -25,7 +25,7 @@
 ;;     i (over a directory) to insert it into current view
 ;;     v to view a file in read-only mode
 ;;     q to quit window (including view windows)
-;;     
+;;
 ;;     g or f5: refresh (f5 is mine)
 ;;
 ;;     ... lots of others (type h)
@@ -37,7 +37,7 @@
 ;;     <next>, <prior> (i.e. page up, down): scroll 5 lines (mine)
 ;;     M-<next>, M-<prior>: scroll 10 lines (mine)
 ;;     M-f: forward-whitespace (mine)
-;;     
+;;
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -105,26 +105,48 @@
       (eval-region)
     (eval-defun)))
 
+(defun kill-word-or-delete-whitespace ()
+  (interactive)
+  (if (is-whitespace (char-after))
+      (delete-forward-whitespace)
+    (kill-word 1)))
+
+(defun is-whitespace (char)
+  (or (eql char (aref " \t\n" 0))
+      (eql char (aref " \t\n" 1))
+      (eql char (aref " \t\n" 2))))
+ 
+(defun delete-forward-whitespace ()
+  (interactive)
+  (let ((orig-pos (point)))
+    (delete-region
+	 orig-pos
+       (progn
+	 (skip-chars-forward " \t")
+	 (constrain-to-field nil orig-pos t)))))
+
+
 (global-set-key (kbd "M-f") 'forward-whitespace)
-(global-set-key "" (quote beginning-of-line-text))
+(global-set-key (kbd "M-d") 'kill-word-or-delete-whitespace)
+(global-set-key (kbd "C-R") (quote beginning-of-line-text))
 (global-set-key [f5] 'my-revert-buffer)
 
-(global-set-key (kbd "<next>")     'my-scroll-up)
-(global-set-key (kbd "<prior>")    'my-scroll-down)
-(global-set-key (kbd "M-<next>")   'my-mega-scroll-up)
-(global-set-key (kbd "M-<prior>")  'my-mega-scroll-down)
+(global-set-key (kbd "<next>")      'my-scroll-up)
+(global-set-key (kbd "<prior>")     'my-scroll-down)
+(global-set-key (kbd "M-<next>")    'my-mega-scroll-up)
+(global-set-key (kbd "M-<prior>")   'my-mega-scroll-down)
 
-(global-set-key (kbd "C-<down>")   'my-forward-lines)
-(global-set-key (kbd "C-<up>")     'my-backward-lines)
+(global-set-key (kbd "C-<down>")    'my-forward-lines)
+(global-set-key (kbd "C-<up>")      'my-backward-lines)
 
-(global-set-key (kbd "C-x C-a")    'recentf-open-files)
+(global-set-key (kbd "C-x C-a")     'recentf-open-files)
 
-(global-set-key (kbd "C-M-<down>") 'shrink-window)
-(global-set-key (kbd "C-M-<up>")   'enlarge-window)
+(global-set-key (kbd "C-M-<down>")  'shrink-window)
+(global-set-key (kbd "C-M-<up>")    'enlarge-window)
 (global-set-key (kbd "C-M-<right>") 'enlarge-window-horizontally)
-(global-set-key (kbd "C-M-<left>") 'shrink-window-horizontally)
+(global-set-key (kbd "C-M-<left>")  'shrink-window-horizontally)
 
-;; I should try to mod this so it can indent backward as well as indent even
+;; I should try to mod this so it can indent backward and indent even
 ;; if the cursor is placed in the middle of a word.
 ;; Follow the help for indent-relative-maybe to the lisp code for it.
 (global-set-key (kbd "C-<tab>")	'indent-relative-maybe)
@@ -133,7 +155,7 @@
 (global-set-key (kbd "C-A-x")  'eval-region-or-defun)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; imenu 
+;; imenu
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (global-font-lock-mode 1)
@@ -149,7 +171,7 @@
 ;; The python.org python-mode.el (as opposed to the GNU Emacs python.el)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;(add-hook 'python-mode-hook 
+;(add-hook 'python-mode-hook
 ;	  '(lambda () (define-key python-mode-map "\C-m" 'newline-and-indent)))
 
 (when (file-accessible-directory-p "~/local/emacs/python-mode-1.0-patched")
@@ -211,16 +233,16 @@
   (interactive)
   (with-output-to-temp-buffer "*Tip of the day*"
     (let* ((commands (loop for s being the symbols
-                           when (commandp s) collect s))
-           (command (nth (random (length commands)) commands)))
+			   when (commandp s) collect s))
+	   (command (nth (random (length commands)) commands)))
       (princ
        (concat "Your tip for the day is:\\n"
-               "========================\\n\\n"
-               (describe-function command)
-               "\\n\\nInvoke with:\\n\\n"
-               (with-temp-buffer
-                 (where-is command t)
-                 (buffer-string)))))))
+	       "========================\\n\\n"
+	       (describe-function command)
+	       "\\n\\nInvoke with:\\n\\n"
+	       (with-temp-buffer
+		 (where-is command t)
+		 (buffer-string)))))))
 
 
 
@@ -295,20 +317,19 @@
    ;; If you edit it by hand, you could mess it up, so be careful.
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
-   '(default ((t (:stipple nil :background "#ffffff" :foreground "black" 
-			   :inverse-video nil :box nil :strike-through nil 
-			   :overline nil :underline nil :slant normal 
-			   :weight normal :height 120 :width normal 
+   '(default ((t (:stipple nil :background "#ffffff" :foreground "black"
+			   :inverse-video nil :box nil :strike-through nil
+			   :overline nil :underline nil :slant normal
+			   :weight normal :height 120 :width normal
 			   :family "terminus")))))
-  
+
   (custom-set-variables
    ;; custom-set-variables was added by Custom.
    ;; If you edit it by hand, you could mess it up, so be careful.
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
    '(default ((t (:stipple nil :background "#ffffff" :foreground "black"
-			   :inverse-video nil :box nil :strike-through nil 
+			   :inverse-video nil :box nil :strike-through nil
 			   :overline nil :underline nil :slant normal
 			   :weight normal :height 120 :width normal
 			   :family "terminus"))))))
-
