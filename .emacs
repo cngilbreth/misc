@@ -102,14 +102,14 @@
 (defun eval-region-or-defun ()
   (interactive)
   (if (and mark-active transient-mark-mode)
-      (eval-region)
-    (eval-defun)))
+      (call-interactively 'eval-region)
+    (call-interactively 'eval-defun)))
 
 (defun kill-word-or-delete-whitespace ()
   (interactive)
   (if (is-whitespace (char-after))
       (delete-forward-whitespace)
-    (kill-word 1)))
+    (my-kill-word 1)))
 
 (defun is-whitespace (char)
   (or (eql char (aref " \t\n" 0))
@@ -125,9 +125,63 @@
 	 (skip-chars-forward " \t")
 	 (constrain-to-field nil orig-pos t)))))
 
+(defconst my-word-chars "[:alnum:]\"'")
+(defconst my-non-word-chars "^[:space:]\n[:alnum:]\"'")
 
-(global-set-key (kbd "M-f") 'forward-whitespace)
-(global-set-key (kbd "M-d") 'kill-word-or-delete-whitespace)
+(defun my-kill-word ()
+  (interactive)
+  (kill-region (point) (my-forward-word)))
+
+(defun my-backward-kill-word ()
+  (interactive)
+  (kill-region (point) (my-backward-word) (point)))
+
+
+(defun my-forward-word ()
+  (interactive)
+  (let ((c (char-after)))
+    (cond ((is-word-char c) (skip-chars-forward my-word-chars))
+	  ((is-whitespace c) (skip-chars-forward "[:space:]\n"))
+	  ('t (skip-chars-forward my-non-word-chars))))
+  (point))
+
+(defun my-backward-word ()
+  (interactive)
+  (let ((c (char-before)))
+    (cond ((is-word-char c) (skip-chars-backward my-word-chars))
+	  ((is-whitespace c) (skip-chars-backward "[:space:]\n"))
+	  ('t (skip-chars-backward my-non-word-chars))))
+  (point))
+
+(defun my-forward-whitespace ()
+  (interactive)
+  (if (is-whitespace (char-after))
+      (skip-chars-forward "[:space:]\n")
+    (skip-chars-forward "^[:space:]\n")))
+
+(defun my-backward-whitespace ()
+  (interactive)
+  (if (is-whitespace (char-before))
+      (skip-chars-backward "[:space:]\n")
+    (skip-chars-backward "^[:space:]\n")))
+
+
+(defun is-word-char (char)
+  (if (string-match (concat "[" my-word-chars "]")
+		    (char-to-string char))
+      't
+    nil))
+
+(global-set-key (kbd "C-<backspace>") 'my-backward-kill-word)
+(global-set-key (kbd "M-d") 'my-forward-kill-word)
+
+(global-set-key (kbd "C-<right>") 'my-forward-word)
+(global-set-key (kbd "C-<left>")  'my-backward-word)
+
+(global-set-key (kbd "M-<right>") 'my-forward-whitespace)
+(global-set-key (kbd "M-<left>")  'my-backward-whitespace)
+
+
 (global-set-key (kbd "C-R") (quote beginning-of-line-text))
 (global-set-key [f5] 'my-revert-buffer)
 
