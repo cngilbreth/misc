@@ -99,20 +99,38 @@
   (interactive)
   (previous-line 4))
 
+(defun eval-region-or-defun ()
+  (interactive)
+  (if (and mark-active transient-mark-mode)
+      (eval-region)
+    (eval-defun)))
 
 (global-set-key (kbd "M-f") 'forward-whitespace)
 (global-set-key "" (quote beginning-of-line-text))
 (global-set-key [f5] 'my-revert-buffer)
 
-(global-set-key (kbd "<next>")  'my-scroll-up)
-(global-set-key (kbd "<prior>") 'my-scroll-down)
-(global-set-key (kbd "M-<next>") 'my-mega-scroll-up)
-(global-set-key (kbd "M-<prior>") 'my-mega-scroll-down)
+(global-set-key (kbd "<next>")     'my-scroll-up)
+(global-set-key (kbd "<prior>")    'my-scroll-down)
+(global-set-key (kbd "M-<next>")   'my-mega-scroll-up)
+(global-set-key (kbd "M-<prior>")  'my-mega-scroll-down)
 
-(global-set-key (kbd "C-<down>") 'my-forward-lines)
-(global-set-key (kbd "C-<up>") 'my-backward-lines)
+(global-set-key (kbd "C-<down>")   'my-forward-lines)
+(global-set-key (kbd "C-<up>")     'my-backward-lines)
 
-(global-set-key (kbd "C-x C-a") 'recentf-open-files)
+(global-set-key (kbd "C-x C-a")    'recentf-open-files)
+
+(global-set-key (kbd "C-M-<down>") 'shrink-window)
+(global-set-key (kbd "C-M-<up>")   'enlarge-window)
+(global-set-key (kbd "C-M-<right>") 'enlarge-window-horizontally)
+(global-set-key (kbd "C-M-<left>") 'shrink-window-horizontally)
+
+;; I should try to mod this so it can indent backward as well as indent even
+;; if the cursor is placed in the middle of a word.
+;; Follow the help for indent-relative-maybe to the lisp code for it.
+(global-set-key (kbd "C-<tab>")	'indent-relative-maybe)
+
+;; Why doesn't this work with C-M-x ?
+(global-set-key (kbd "C-A-x")  'eval-region-or-defun)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; imenu 
