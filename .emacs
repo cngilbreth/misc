@@ -48,13 +48,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (customize-set-variable 'tool-bar-mode 't)
-(global-font-lock-mode t)
-(mouse-wheel-mode t)
+(global-font-lock-mode 't)
+(mouse-wheel-mode 't)
+(column-number-mode 't)
 
-(setq inhibit-startup-message t)
+(setq inhibit-startup-message 't)
 
 (require 'recentf)
-(recentf-mode t)
+(recentf-mode 't)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -67,7 +68,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Shortcuts
+;; Functions for my custom shortcuts
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Not 100% sure if the keyword option here works
@@ -105,12 +106,6 @@
       (call-interactively 'eval-region)
     (call-interactively 'eval-defun)))
 
-(defun kill-word-or-delete-whitespace ()
-  (interactive)
-  (if (is-whitespace (char-after))
-      (delete-forward-whitespace)
-    (my-kill-word 1)))
-
 (defun is-whitespace (char)
   (or (eql char (aref " \t\n" 0))
       (eql char (aref " \t\n" 1))
@@ -137,18 +132,46 @@
   (kill-region (point) (my-backward-word) (point)))
 
 
+
+;; If true, will make my-forward-word and my-backward-word traverse over a
+;; word prefixed by a non-word-character as if it were one entity. E.g.
+;;
+;;    abc!-def-ghi -> abc-def!-ghi
+;;       ^ point             ^
+;;
+;; Havne't quite decided which behavior I like better. I do think having it set
+;; to 't is a little more flexible, because one can always use forward-char if
+;; one just wants to go forward one character.
+;;
+;; Of course since these functions are used in my kill functions, the same rules
+;; will apply there too.
+
+(defconst skip-prefixed 't)
+
 (defun my-forward-word ()
   (interactive)
-  (let ((c (char-after)))
+  (let ((c (char-after))
+	(cp (char-after (+ 1 (point)))))
     (cond ((is-word-char c) (skip-chars-forward my-word-chars))
+	  ((and skip-prefixed
+		(is-non-word-char c)
+		(is-word-char cp))
+	   (forward-char)
+	   (skip-chars-forward my-word-chars))
 	  ((is-whitespace c) (skip-chars-forward "[:space:]\n"))
 	  ('t (skip-chars-forward my-non-word-chars))))
   (point))
 
 (defun my-backward-word ()
   (interactive)
-  (let ((c (char-before)))
+  (let ((c (char-before))
+	(cp (char-before (- (point) 1))))
     (cond ((is-word-char c) (skip-chars-backward my-word-chars))
+	  ((and skip-prefixed
+		(is-non-word-char c)
+		(is-word-char cp))
+	   (backward-char)
+	   (skip-chars-backward my-word-chars))
 	  ((is-whitespace c) (skip-chars-backward "[:space:]\n"))
 	  ('t (skip-chars-backward my-non-word-chars))))
   (point))
@@ -172,8 +195,24 @@
       't
     nil))
 
+(defun is-non-word-char (char)
+  (if (or (string-match (concat "[" my-non-word-chars "]")
+		    (char-to-string char))
+	  (eql (aref " " 0) char))
+      't
+    nil))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Keyboard Shortcuts
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(global-set-key (kbd "C-S-s") 'isearch-backward)
+
 (global-set-key (kbd "C-<backspace>") 'my-backward-kill-word)
-(global-set-key (kbd "M-d") 'my-forward-kill-word)
+(global-set-key (kbd "M-d") 'my-kill-word)
+(global-set-key (kbd "C-<delete>") 'my-kill-word)
+(global-set-key (kbd "M-<delete>") 'my-kill-word)
 
 (global-set-key (kbd "C-<right>") 'my-forward-word)
 (global-set-key (kbd "C-<left>")  'my-backward-word)
