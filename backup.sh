@@ -13,6 +13,9 @@ then
 elif [ "$1" == "quota" ]
 then
     ACTION="quota"
+elif [ "$1" == "ls" ]
+then
+    ACTION="ls"
 elif [ $# -gt 0 ]
 then
     echo "Unknown command line arguments."
@@ -112,6 +115,11 @@ remove_extras()
     rbackup-remove.sh -v $VAULT 6 $REMOTE_DEST
 }
 
+list_backups()
+{
+    ssh $REMOTE_USER@$REMOTE_HOST ls -l "$REMOTE_PATH/$VAULT/"
+}
+
 
 if [ "$ACTION" == "backup" ]
 then
@@ -122,7 +130,8 @@ then
 elif [ "$ACTION" == "quota" ]
 then
     ssh "$REMOTE_USER@$REMOTE_HOST" quota
+elif [ "$ACTION" == "ls" ]
+then
+    list_backups
 fi
 
-
-    
