@@ -51,11 +51,44 @@
 (global-font-lock-mode 't)
 (mouse-wheel-mode 't)
 (column-number-mode 't)
-
+(blink-cursor-mode 0)
+(setq transient-mark-mode 't)
 (setq inhibit-startup-message 't)
 
 (require 'recentf)
 (recentf-mode 't)
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Fortran helper routines
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun fortran-add-variable (name type)
+  (interactive "MName of variable: \nMType (including kind): ")
+  (message "You typed %s and %s" name type))
+
+
+;; To replace single-precision literals with double-precision ones
+;; in fortran code
+;; e.g. 1.0 -> 1.0_dp
+;; 3.456E-10 -> 3.456E-10_dp
+;; Unfortunately also matches double-precision literals.
+(defun fortran-repalce-sp ()
+  (interactive)
+  (query-replace-regexp "\\([0-9]+\\.[0-9Ee+-]+\\)\\(_sp\\)?" "\\1_dp"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Random stuff
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; For making latex tables from tab-separated data
+;; Really sloppy
+(defun munge (point mark)
+  (interactive "r")
+  (replace-regexp "\\([0-9.-]\\)	\\([0-9-]\\)" "\\1 & \\2" nil point mark)
+  (replace-regexp "^\\([0-9]\\)" "$\\1$" nil point (+ mark 40))
+  (replace-regexp "\\([0-9.]\\)	*$" "\\1\\\\\\\\
+    \\\\hline" nil point (+ mark 100))) 
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

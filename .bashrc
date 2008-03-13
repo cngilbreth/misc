@@ -3,6 +3,12 @@
 # for examples
 # Customized by CG
 
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+
+
 # If not running interactively, don't do anything
 #[ -z "$PS1" ] && return
 
@@ -125,6 +131,13 @@ fi
 # set PYTHONPATH to include my stuff
 if [ -d $HOME/Projects/cg_pylib ] ; then
     PYTHONPATH="$PYTHONPATH:$HOME/Projects/cg_pylib"
+fi
+
+
+# for Bethe
+if [ -d "home/chris/local/TeXmacs-1.0.6-static-gnu-linux" ]; then
+    export TEXMACS_PATH=/home/chris/local/TeXmacs-1.0.6-static-gnu-linux
+    export PATH=$TEXMACS_PATH/bin:$PATH
 fi
 
 test -r /sw/bin/init.sh && . /sw/bin/init.sh
