@@ -33,6 +33,7 @@
 ;;
 ;; Navigation:
 ;;
+;;     C-l: scroll the window so the point is centered vertically
 ;;     C-<down>, C-<up>: move cursor by 4 lines (mine)
 ;;     <next>, <prior> (i.e. page up, down): scroll 5 lines (mine)
 ;;     M-<next>, M-<prior>: scroll 10 lines (mine)
@@ -57,6 +58,10 @@
 (require 'recentf)
 (recentf-mode 't)
 
+(when (file-accessible-directory-p "~/local/emacs")
+  (add-to-list 'load-path "~/local/emacs")
+  (require 'ido)
+  (ido-mode 't))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; icicles
@@ -133,12 +138,6 @@
 
 
 
-;; If true, will make my-forward-word and my-backward-word traverse over a
-;; word prefixed by a non-word-character as if it were one entity. E.g.
-;;
-;;    abc!-def-ghi -> abc-def!-ghi
-;;       ^ point             ^
-;;
 ;; Havne't quite decided which behavior I like better. I do think having it set
 ;; to 't is a little more flexible, because one can always use forward-char if
 ;; one just wants to go forward one character.
@@ -146,7 +145,16 @@
 ;; Of course since these functions are used in my kill functions, the same rules
 ;; will apply there too.
 
-(defconst skip-prefixed 't)
+(defvar skip-prefixed 't
+"If true, will make my-forward-word and my-backward-word traverse
+over a word prefixed by a non-word-character as if it were one
+entity. E.g.
+
+   abc!-def-ghi -> abc-def!-ghi
+      ^ point             ^
+
+Because these functions are used in my kill-word functions, the
+same behavior will apply there.")
 
 (defun my-forward-word ()
   (interactive)
@@ -252,12 +260,18 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (global-font-lock-mode 1)
+
+(setq imenu-auto-rescan 1)
 (add-hook 'c-mode-hook 'imenu-add-menubar-index)
 (add-hook 'python-mode-hook 'imenu-add-menubar-index)
-(add-hook 'latex-mode-hook 'imenu-add-menubar-index)
-(add-hook 'tex-mode-hook 'imenu-add-menubar-index)
+(add-hook 'LaTeX-mode-hook 'imenu-add-menubar-index)
+(add-hook 'TeX-mode-hook 'imenu-add-menubar-index)
+(add-hook 'TeX-PDF-mode-hook 'imenu-add-menubar-index)
+(add-hook 'docTeX-PDF-mode-hook 'imenu-add-menubar-index)
 (add-hook 'f90-mode-hook 'imenu-add-menubar-index)
 (add-hook 'fortran-mode-hook 'imenu-add-menubar-index)
+(add-hook 'emacs-lisp-mode-hook 'imenu-add-menubar-index)
+(add-hook 'lisp-mode-hook 'imenu-add-menubar-index)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
