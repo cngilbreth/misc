@@ -455,7 +455,8 @@ the beginning of the line."
    '(blink-cursor-mode nil)
    '(fill-column 80)
    '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
-   '(transient-mark-mode t)))
+   '(transient-mark-mode t)
+   '(f90-smart-end 'noblink)))
 
 (when window-system
     (custom-set-faces
