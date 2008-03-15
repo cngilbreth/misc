@@ -288,6 +288,16 @@ same behavior will apply there.")
       't
     nil))
 
+(defun my-beginning-of-line ()
+  "Moves to the beginning of the line text if the point is not
+already there or at the beginning of the line. If it is, moves to
+the beginning of the line."
+  (interactive)
+  (let ((p (point)))
+    (beginning-of-line-text)
+    (if (eql p (point))
+	(beginning-of-line))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keyboard Shortcuts
@@ -306,8 +316,7 @@ same behavior will apply there.")
 (global-set-key (kbd "M-<right>") 'my-forward-whitespace)
 (global-set-key (kbd "M-<left>")  'my-backward-whitespace)
 
-
-(global-set-key (kbd "C-R") (quote beginning-of-line-text))
+(global-set-key (kbd "C-,") 'my-beginning-of-line)
 (global-set-key [f5] 'my-revert-buffer)
 
 (global-set-key (kbd "<next>")      'my-scroll-up)
