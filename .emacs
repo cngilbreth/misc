@@ -62,7 +62,47 @@
 (when (file-accessible-directory-p "~/local/emacs")
   (add-to-list 'load-path "~/local/emacs")
   (require 'ido)
-  (ido-mode 't))
+  (ido-mode 'buffers))
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Functions for working with ROBODOC
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun robo-module (name description)
+  (interactive "MName of module: \nMOne-line-description: ")
+  (let ((doc
+	 (concat
+	  "!*******************************************************************************\n"
+	  "!****h*" name "/" name "\n"
+	  "! NAME" "\n"
+	  "!   " name " -- " description "\n"
+	  "!*******************************************************************************\n"
+	  "! 2008 Chris Gilbreth \n"
+	  "!*******************************************************************************\n\n")))
+    (insert doc)))
+
+(defun robo-function (name description)
+  (interactive "MName of function: \nMOne-line-description: ")
+  (let ((doc
+	 (concat
+	  "!*******************************************************************************\n"
+	  "!****f*" "<module>" "/" name "\n"
+	  "! NAME\n"
+	  "!   " name " -- " description "\n"
+	  "! SYNOPSIS\n"
+	  "!   \n"
+	  "! INPUTS\n"
+	  "!   *  - (in) \n"
+	  "!   *  - (out) \n"
+	  "! NOTES\n"
+	  "!   \n"
+	  "!*******************************************************************************\n")))
+    (insert doc)))
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -82,6 +122,12 @@
   (interactive)
   (query-replace-regexp "\\([0-9]+\\.[0-9Ee+-]+\\)\\(_sp\\)?" "\\1_dp"))
 
+
+
+
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Random stuff
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -96,13 +142,8 @@
     \\\\hline" nil point (+ mark 100))) 
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; icicles
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;(when (file-accessible-directory-p "~/local/emacs/icicles")
-;  (add-to-list 'load-path "~/local/emacs/icicles/")
-;  (require 'icicles))
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -114,21 +155,25 @@
   (interactive)
   (revert-buffer :ignore_auto nil))
 
+
+(defvar scroll-divisor 5)
+(defvar mega-scroll-divisor 2)
+
 (defun my-scroll-up ()
   (interactive)
-  (scroll-up 6))
+  (scroll-up (/ (window-height) scroll-divisor)))
 
 (defun my-mega-scroll-up ()
   (interactive)
-  (scroll-up 12))
+  (scroll-up (/ (window-height) mega-scroll-divisor)))
 
 (defun my-scroll-down ()
   (interactive)
-  (scroll-down 6))
+  (scroll-down (/ (window-height) scroll-divisor)))
 
 (defun my-mega-scroll-down ()
   (interactive)
-  (scroll-down 12))
+  (scroll-down (/ (window-height) mega-scroll-divisor)))
 
 (defun my-forward-lines ()
   (interactive)
