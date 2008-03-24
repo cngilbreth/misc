@@ -44,7 +44,8 @@ then
 
 elif [ "$HOST" == "bethe.physics.yale.edu" ]
 then
-    SOURCES="/home/chris/Documents /home/chris/Archive /home/chris/Projects"
+    SOURCES="/home/chris/Documents /home/chris/Archive /home/chris/Projects \
+/home/chris/oxbash"
     VAULT="bethe"
 
 else
