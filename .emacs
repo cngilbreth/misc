@@ -59,12 +59,47 @@
 (require 'recentf)
 (recentf-mode 't)
 
-(when (file-accessible-directory-p "~/local/emacs")
-  (add-to-list 'load-path "~/local/emacs")
+(when (file-accessible-directory-p "~/emacs")
+  (add-to-list 'load-path "~/emacs")
   (require 'ido)
   (ido-mode 'buffers))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; other customizations
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(when (file-accessible-directory-p "~/emacs")
+  (add-to-list 'load-path "~/emacs"))
+
+
+(when (file-accessible-directory-p "~/emacs/tramp/lisp")
+  (add-to-list 'load-path "~/emacs/tramp/lisp")
+  (require 'tramp)
+  (add-to-list 'Info-default-directory-list "~/emacs/tramp/info/"))
+
+(customize-set-variable 'tramp-default-method "scpc")
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Keyboard macros
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(fset 'grab-energies
+   (lambda (&optional arg) "Keyboard
+   macro." (interactive "p") (kmacro-exec-ring-item (quote ([19
+   69 110 101 114 103 121 32 108 101 118 101 108 115 32 58 13
+   down 1 67108896 19 35 32 111 102 32 105 116 101 114 97 116 105
+   111 110 115 32 58 13 1 134217848 up up down down 99 111 112
+   121 45 116 111 45 114 101 103 105 115 116 101 114 return 101
+   134217786 40 100 101 97 99 116 105 118 97 116 101 45 109 97
+   114 107 41 return 18 86 97 108 117 101 32 111 102 32 74 42 50
+   44 32 84 42 50 13 down 67108896 5 134217847 24 111 74 42 50 44
+   32 84 42 50 58 32 25 return return 24 114 105 101 134217790
+   return 24 111 19 69 110 101 114 103 121 32 108 101 118 101 108
+   115 32 58 13 19 35 32 111 102 32 105 116 101 114 97 116 105
+   111 110 115 13 down down] 0 "%d")) arg)))
 
 
 
