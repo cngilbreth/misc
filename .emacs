@@ -56,6 +56,8 @@
 (setq transient-mark-mode 't)
 (setq inhibit-startup-message 't)
 
+(customize-set-variable 'auto-fill-mode 't) ; very nice in f90 mode
+
 (require 'recentf)
 (recentf-mode 't)
 
@@ -101,7 +103,15 @@
    115 32 58 13 19 35 32 111 102 32 105 116 101 114 97 116 105
    111 110 115 13 down down] 0 "%d")) arg)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; SLIME
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(when (file-accessible-directory-p "/usr/local/lib/sbcl")
+  (setq inferior-lisp-program "/usr/local/bin/sbcl")
+;;  (add-to-list 'load-path "the path of your slime directory")
+  (require 'slime)
+  (slime-setup))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Functions for working with ROBODOC
@@ -120,12 +130,12 @@
 	  "!*******************************************************************************\n\n")))
     (insert doc)))
 
-(defun robo-function (name description)
+(defun robo-function-extended (name description)
   (interactive "MName of function: \nMOne-line-description: ")
   (let ((doc
 	 (concat
 	  "!*******************************************************************************\n"
-	  "!****f*" "<module>" "/" name "\n"
+	  "!****f* <module>" "/" name "\n"
 	  "! NAME\n"
 	  "!   " name " -- " description "\n"
 	  "! SYNOPSIS\n"
@@ -133,6 +143,19 @@
 	  "! INPUTS\n"
 	  "!   *  - (in) \n"
 	  "!   *  - (out) \n"
+	  "! NOTES\n"
+	  "!   \n"
+	  "!*******************************************************************************\n")))
+    (insert doc)))
+
+(defun robo-function-concise (name description)
+  (interactive "MName of function: \nMOne-line-description: ")
+  (let ((doc
+	 (concat
+	  "!*******************************************************************************\n"
+	  "!****f* <module>" "/" name "\n"
+	  "! NAME\n"
+	  "!   " name " -- " description "\n"
 	  "! NOTES\n"
 	  "!   \n"
 	  "!*******************************************************************************\n")))
@@ -147,6 +170,15 @@
   (interactive "MName of variable: \nMType (including kind): ")
   (message "You typed %s and %s" name type))
 
+(defvar line-comment-length 40)
+(defun fortran-add-line-comment (str)
+  (interactive "Mstring: ")
+  (insert (concat "!-- " str " "))
+  (insert-char (aref "-" 0) (- line-comment-length (length str) 6))
+  (insert "!"))
+
+		  
+		  
 
 ;; To replace single-precision literals with double-precision ones
 ;; in fortran code
