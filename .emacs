@@ -105,6 +105,11 @@
    115 32 58 13 19 35 32 111 102 32 105 116 101 114 97 116 105
    111 110 115 13 down down] 0 "%d")) arg)))
 
+;; To bind a keyboard macro to f6: first call kmacro-name-last-macro
+;; Then copy this line to a scratch buffer, modify and execute
+;(global-set-key [f6] 'grab-energies)
+;; I have this here because using the macro ring is sometimes difficult
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; SLIME
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -547,8 +552,8 @@ the beginning of the line."
      '(font-lock-string-face ((((class color) (min-colors 88) (background light)) (:foreground "#977563"))))
      '(font-lock-type-face ((((class color) (min-colors 88) (background light)) (:underline "grey50" :weight bold))))
      '(font-lock-variable-name-face ((((class color) (min-colors 88) (background light)) (:foreground "#1E3149"))))
-     '(mode-line ((t (:background "#f6f6f6" :foreground "grey30" :box (:line-width 1 :color "grey50")))))
-     '(mode-line-inactive ((default (:inherit mode-line)) (((class color) (min-colors 88) (background light)) nil)))
+     '(mode-line ((t (:background "#f6f6f6" :foreground "grey10" :box (:line-width 1 :color "grey50")))))
+     '(mode-line-inactive ((default (:inherit mode-line :foreground "grey30")) (((class color) (min-colors 88) (background light)) nil)))
      '(region ((((class color) (min-colors 88) (background light)) (:background "#BDD5FC"))))))
 
 
