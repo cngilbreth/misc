@@ -80,9 +80,11 @@
   (require 'tramp)
   (add-to-list 'Info-default-directory-list "~/emacs/tramp/info/"))
 
-(customize-set-variable 'tramp-default-method "scpc")
+;;(customize-set-variable 'tramp-default-method "scpc")
+(customize-set-variable 'scheme-program-name "guile")
+(customize-set-variable 'show-paren-mode t)
 
-
+(customize-set-variable 'asm-comment-char ?#)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keyboard macros
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -574,6 +576,9 @@ the beginning of the line."
 
 
 (when (string= (system-name) "Autumn")
+  (customize-set-variable 'lpr-command "gtklp")
+  (customize-set-variable 'ps-lpr-command "gtklp")
+
   (custom-set-faces
    ;; custom-set-faces was added by Custom.
    ;; If you edit it by hand, you could mess it up, so be careful.
