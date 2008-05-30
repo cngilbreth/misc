@@ -152,6 +152,9 @@ test -r /usr/local/intel/fc/10.1.008/bin/ifortvars.sh && \
 test -r /usr/local/intel/idb/10.1.008/bin/idbvars.sh && \
     . /usr/local/intel/idb/10.1.008/bin/idbvars.sh
 
+test -r /opt/intel/fc/10.1.014/bin/ifortvars.sh && \
+    . /opt/intel/fc/10.1.014/bin/ifortvars.sh
+
 export PATH
 export PYTHONPATH
 

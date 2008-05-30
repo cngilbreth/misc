@@ -32,7 +32,8 @@ HOST=`hostname`
 
 if [ "$HOST" == "Physics-06-15" ]
 then
-    SOURCES="/Users/cng8/bin /Users/cng8/Documents /Users/cng8/.Xmodmap"
+    SOURCES="/Users/cng8/bin /Users/cng8/Documents /Users/cng8/.Xmodmap \
+/Users/cng8/Projects"
     VAULT="macbook"
 
 elif [ "$HOST" == "Autumn" ]
