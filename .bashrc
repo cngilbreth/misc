@@ -158,4 +158,4 @@ test -r /opt/intel/fc/10.1.014/bin/ifortvars.sh && \
 export PATH
 export PYTHONPATH
 
-xset b off
+#xset b off
