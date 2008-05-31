@@ -576,11 +576,11 @@ the beginning of the line."
 					 (font . "-apple-monaco-medium-r-normal--12-0-72-72-m-0-iso10646-1") (tool-bar-lines . 0))))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Autumn
+;; Winter
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(when (string= (system-name) "Autumn")
+(when (string= (system-name) "Winter")
   (customize-set-variable 'lpr-command "gtklp")
   (customize-set-variable 'ps-lpr-command "gtklp")
 
