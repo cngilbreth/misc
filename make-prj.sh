@@ -2,10 +2,23 @@
 ################################################################################
 # make-prj.sh
 # Script to create a directory structure and makefile for a small programming
-# project (only for Fortran 90 at present)
+# project (only for Fortran 90 at present).
+#
+# Will create and move your files into the following directory structure:
+#
+#   ./			Containing target binary
+#   ./src		Containing source .f90 and .f files
+#   ./build		Containing .o files
+#   ./mod   		Containing .mod files
+#
+#   ./lib               For you to put your external libraries and .mod's in
+#          		(contents will be automatically linked to program)
+#   ./doc		For documentation
+#   ./run               For running the program & saving output
+#
 ################################################################################
 
-##########################################################################################
+################################################################################
 # Functions
 ################################################################################
 
@@ -41,10 +54,10 @@ read target
 
 
 echo -n "Locating source files..."
-SRCS=`find ./ -iname *.f90 | grep -v -i 'lapack' | sed -e 's/^\.\///' | tr '\n'\
-          ' '`
+SRCS=`find ./ -iname *.f90 | grep -v -i -E '\./lib' | sed -e 's/^\.\///'\
+         | tr '\n' ' '`
 check_last_cmd
-SRCS=`echo $SRCS | sed -e 's/ +$//'`
+SRCS=`echo $SRCS | sed -e 's/ +$//'` # kill trailing space
 check_last_cmd
 echo -n "Found: $SRCS. "
 get_user_verification "Is this correct?"
@@ -53,21 +66,8 @@ if [ $ans == "n" ]; then
     exit
 fi
 
-echo -n "Checking for cg_flib dependence..."
-CGFLIB=$(grep -i -c -E 'type_decls|ftest|util_io' $SRCS | grep -c '\:[1-9][0-9]*')
-#check_last_cmd
-if [ "$CGFLIB" != "0" ]; then
-    echo "yes"
-    get_user_verification "Include cg_flib from ~/Projects/cg_flib/?"
-    if [ $ans == "n" ]; then
-	CGFLIB="0"
-    fi
-else
-    echo "no"
-fi
-
 echo -n "Creating directory structure..."
-mkdir -p src build run doc
+mkdir -p src build run doc mod
 check_last_cmd
 echo "done"
 
@@ -81,44 +81,29 @@ echo "done"
 
 echo -n "Creating Makefile..."
 OBJS=`echo $SRCS | tr ' ' '\n' | sed -e 's/.f90$/.o/' | \
-    sed -e 's/^src\///' | tr '\n' ' '`
+         tr '\n' ' '`
 check_last_cmd
+
+OBJS1=""
+for file in $OBJS
+do
+    OBJS1="$OBJS1 `basename $file`"
+done
+OBJS="$OBJS1"
 
 >Makefile
 cat >> Makefile <<EOF
 FC=gfortran
-FCOPTS=-Wall -funroll-all-loops -O3 -march=native
+FCOPTS=-Wall -funroll-all-loops -O3 -march=native -Jmod
 
-EOF
-
-if [ "$CGFLIB" -ge 1 ]; then
-    cat >> Makefile <<EOF
 ################################################################################
 # Libraries
 ################################################################################
 
-CG_FLIB=\$(HOME)/Projects/cg_flib
-INCLUDE=-I\$(CG_FLIB)
-# NOTE: libs have to be included LAST when linking
-LIBS=\$(CG_FLIB)/cg_flib.a
-
-EOF
-    check_last_cmd
-else
-    cat >> Makefile <<EOF
-################################################################################
-# Libraries
-################################################################################
-
-INCLUDE=
+INCLUDE=-Ilib
 # NOTE: libs have to be included LAST when linking using gcc/gfortran
-LIBS=
+LIBS=\$(shell /bin/ls lib/*.a 2>/dev/null)
 
-EOF
-    check_last_cmd
-fi
-
-cat >> Makefile <<EOF
 ################################################################################
 # Targets
 ################################################################################
@@ -129,32 +114,39 @@ vpath %.o build
 all: $target
 
 $target: ${OBJS} \$(LIBS)
-	\$(FC) \$(FCOPTS) -o \$@ \$(patsubst %.o,build/%.o,\$+)
+	\$(FC) \$(FCOPTS) -o \$@ \$+
 
 clean:
-	rm -f *.o *.mod $target build/*.o build/*.mod
+	rm -f *.o *.mod $target build/*.o mod/*.mod
 
 ################################################################################
 # object files and dependencies
 ################################################################################
 
-# List dependencies here
+# List dependencies here. (Note, you don't need to include the build/ prefix on
+# object files after the ':'s.)
 EOF
+check_last_cmd
 
 for obj in $OBJS
 do
-    echo "${obj}: " >> Makefile
+    echo "build/${obj}: " >> Makefile
 done
 
 cat >> Makefile <<EOF
 
-%.o: %.f90
-	\$(FC) \$(FCOPTS) \$(INCLUDE) -c \$< -o build/\$@
+build/%.o: %.f90
+	\$(FC) \$(FCOPTS) \$(INCLUDE) -c \$< -o \$@
+build/%.o: %.f
+	\$(FC) \$(FCOPTS) \$(INCLUDE) -c \$< -o \$@
 
 EOF
+check_last_cmd
 
 echo "done"
 
-echo ""
-echo "Makefile created. Note, you may have to edit it to include dependencies"
-echo "between object files."
+cat <<EOF
+
+Note, one may have to edit the makefile to include dependencies between object
+files and dependencies on any external libraries in lib/.
+EOF
