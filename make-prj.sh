@@ -54,7 +54,7 @@ read target
 
 
 echo -n "Locating source files..."
-SRCS=`find ./ -iname *.f90 | grep -v -i -E '\./lib' | sed -e 's/^\.\///'\
+SRCS=`find . -iname '*.f90' -o -iname '*.f' | grep -v -i -E '\./lib' | sed -e 's/^\.\///'\
          | tr '\n' ' '`
 check_last_cmd
 SRCS=`echo $SRCS | sed -e 's/ +$//'` # kill trailing space
@@ -67,7 +67,7 @@ if [ $ans == "n" ]; then
 fi
 
 echo -n "Creating directory structure..."
-mkdir -p src build run doc mod
+mkdir -p src build run doc mod lib
 check_last_cmd
 echo "done"
 
@@ -80,8 +80,8 @@ done
 echo "done"
 
 echo -n "Creating Makefile..."
-OBJS=`echo $SRCS | tr ' ' '\n' | sed -e 's/.f90$/.o/' | \
-         tr '\n' ' '`
+OBJS=`echo $SRCS | tr ' ' '\n' | sed -r -e 's/.(f|F)(90)?$/.o/' \
+        | tr '\n' ' '`
 check_last_cmd
 
 OBJS1=""
@@ -109,7 +109,9 @@ LIBS=\$(shell /bin/ls lib/*.a 2>/dev/null)
 ################################################################################
 
 vpath %.f90 src
+vpath %.f src
 vpath %.o build
+vpath %.a lib
 
 all: $target
 
