@@ -101,7 +101,9 @@ FCOPTS=-Wall -funroll-all-loops -O3 -march=native -Jmod
 ################################################################################
 
 INCLUDE=-Ilib
-# NOTE: libs have to be included LAST when linking using gcc/gfortran
+# NOTE: libs have to be included LAST when linking using gcc/gfortran, and in
+# the proper order (AFAICT, the reverse order of their dependence. Thus, you may
+# need to replace the following line with a hand-edited one. 
 LIBS=\$(shell /bin/ls lib/*.a 2>/dev/null)
 
 ################################################################################

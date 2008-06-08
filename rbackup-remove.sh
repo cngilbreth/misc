@@ -120,13 +120,13 @@ fi
 get_user_verification()
 {
     ans=""
-    while [ "$ans" != "y" ] && [ "$ans" != "n" ]
+    while [ "$ans" != "y" ] && [ "$ans" != "n" ] && [ "$ans" != "YY" ]
     do
-	echo -n "Are you sure you want to continue? (y/n): "
+	echo -n "Are you sure you want to continue? (y/n/YY='yes to all'): "
 	read ans
-	if [ "$ans" != "y" ] && [ "$ans" != "n" ]
+	if [ "$ans" != "y" ] && [ "$ans" != "n" ] && [ "$ans" != "YY" ]
 	then
-	    echo "Please answer y or n."
+	    echo "Please answer y, n, or YY."
 	fi
     done
 } <&1
@@ -143,10 +143,13 @@ line=""
     do
 	echo "About to delete: $BACKDIR/$VAULT/$line"
 	
-	ans="n"
-	get_user_verification
 	
-	if [ "$ans" == "y" ]
+	if [ "$ans" != "YY" ]; then
+	    ans="n"
+	    get_user_verification
+	fi
+	
+	if [ "$ans" == "y" ] || [ "$ans" == "YY" ]
 	then
 	    echo "Deleting..."
 	    # </dev/null required to keep ssh from grabbing input from the file

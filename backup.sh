@@ -36,11 +36,12 @@ then
 /Users/cng8/Projects"
     VAULT="macbook"
 
-elif [ "$HOST" == "Autumn" ]
+elif [ "$HOST" == "Winter" ]
+# NOTE: Switched Winter to use the Autumn vault on Jun 1, 2008
 then
-    SOURCES="/home/posco/Desktop /home/posco/bin /home/posco/Projects \
-/home/posco/Documents /home/posco/.TeXmacs /home/posco/.emacs \
-/home/posco/.bashrc /home/posco/.bash_profile"
+    SOURCES="/home/chris/Desktop /home/chris/bin /home/chris/Projects \
+/home/chris/Documents /home/chris/.TeXmacs /home/chris/.emacs \
+/home/chris/.bashrc /home/chris/.bash_profile /home/chris/emacs"
     VAULT="autumn"
 
 elif [ "$HOST" == "bethe.physics.yale.edu" ]
@@ -114,7 +115,7 @@ backup()
 
 remove_extras()
 {
-    rbackup-remove.sh -v $VAULT 6 $REMOTE_DEST
+    rbackup-remove.sh -v $VAULT 4 $REMOTE_DEST
 }
 
 list_backups()
