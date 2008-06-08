@@ -60,6 +60,7 @@
 
 (require 'recentf)
 (recentf-mode 't)
+(customize-set-variable 'recentf-exclude '("^/scp"))
 
 (when (file-accessible-directory-p "~/emacs")
   (add-to-list 'load-path "~/emacs")
@@ -80,7 +81,7 @@
   (require 'password)
   (require 'tramp)
   (add-to-list 'Info-default-directory-list "~/emacs/tramp/info/")
-  (customize-set-variable 'password-cache-expiry 1800))
+  (customize-set-variable 'password-cache-expiry nil))
 
 ;;(customize-set-variable 'tramp-default-method "scpc")
 (customize-set-variable 'scheme-program-name "guile")
@@ -378,7 +379,8 @@ the beginning of the line."
 ;; Keyboard Shortcuts
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(global-set-key (kbd "C-S-s") 'isearch-backward)
+(add-hook 'python-mode-hook 
+	  '(lambda () (local-set-key [f1] 'python-complete-symbol)))
 
 (global-set-key (kbd "C-<backspace>") 'my-backward-kill-word)
 (global-set-key (kbd "M-d") 'my-kill-word)
