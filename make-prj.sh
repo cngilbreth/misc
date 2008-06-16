@@ -121,7 +121,7 @@ $target: ${OBJS} \$(LIBS)
 	\$(FC) \$(FCOPTS) -o \$@ \$+
 
 clean:
-	rm -f *.o *.mod $target build/*.o mod/*.mod
+	rm -f *.o *.mod $target build/*.o
 
 ################################################################################
 # object files and dependencies

@@ -110,6 +110,7 @@ alias mv="mv -i"
 #    source /etc/bash_completion
 #fi
 
+alias gopen='gnome-open'  # like 'open' on a mac
 
 ################################################################################
 # PATHS

@@ -4,7 +4,7 @@
 ;;
 ;; Files:
 ;;
-;;     open a recent file (recentf): C-x C-r
+;;     open a recent file (recentf): C-a (my keybinding)
 ;;
 ;;     remote paths OR directories:
 ;;         ftp: C-x C-f /user@host:/path/to/file-or-dir
@@ -39,9 +39,24 @@
 ;;     M-<next>, M-<prior>: scroll 10 lines (mine)
 ;;     M-f: forward-whitespace (mine)
 ;;
+;; Rectangles:
 ;;
+;;     C-x r k: kill rectangle
+;;     C-x r y: yank rectangle
+;;
+;;     C-x r r: copy rectangle to register
+;;     C-x r i: insert register (general command)
+;;
+;;     C-x r d: delete rectangle
+;;     C-x r c: clear rectangle
+;;     C-x r o: open rectangle (shift text right to create open space)
+;;
+;; Cleaning up whitespace:
+;;
+;;     C-u 1 M-x whitespace-buffer
+;;     ;; Above finds whitespace problems. Can then call
+;;     M-x whitespace-cleanup
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -55,6 +70,7 @@
 (blink-cursor-mode 0)
 (setq transient-mark-mode 't)
 (setq inhibit-startup-message 't)
+(customize-set-variable 'scroll-bar-mode 'right)
 
 (customize-set-variable 'auto-fill-mode 't) ; very nice in f90 mode
 
