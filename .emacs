@@ -39,6 +39,10 @@
 ;;     M-<next>, M-<prior>: scroll 10 lines (mine)
 ;;     M-f: forward-whitespace (mine)
 ;;
+;;     C-j: newline and indent
+;;     M-j: newline and indent within comment
+;;     C-o: insert newline and leave point before it
+;;
 ;; Rectangles:
 ;;
 ;;     C-x r k: kill rectangle
@@ -56,6 +60,26 @@
 ;;     C-u 1 M-x whitespace-buffer
 ;;     ;; Above finds whitespace problems. Can then call
 ;;     M-x whitespace-cleanup
+;;
+;; Etags:
+;;
+;;     M-.: find tag
+;;     M-*: Go back to where you where when you invoked M-. and friends
+;;     C-x 4 .: find-tag-other-windo
+;;     C-x 5 .: find-tag-other-frame
+;;
+;;     C-u M-.: find next alternate definition of tag
+;;     C-u - M-.: go back to previous found tag
+;;     C-M-.: find-tag-regexp
+;;     C-u C-m: find next tag whose name matches regexp
+;;
+;;     M-x tags-search
+;;     M-,
+;;     
+;;
+;; Imenu:
+;;
+;;     S-.: find tag through imenu
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -107,6 +131,8 @@
 (defun my-asm-hook ()
   (setq asm-comment-char ?#))
 (add-hook 'asm-mode-set-comment-hook 'my-asm-hook)
+
+(require 'etags-select)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keyboard macros
@@ -395,6 +421,9 @@ the beginning of the line."
 ;; Keyboard Shortcuts
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(global-set-key (kbd "s-.") 'imenu)
+(global-set-key [f9] 'next-error)
+
 (add-hook 'python-mode-hook 
 	  '(lambda () (local-set-key [f1] 'python-complete-symbol)))
 
@@ -542,13 +571,13 @@ the beginning of the line."
    '(scroll-margin 4)
    '(scroll-step 6)
    '(visual-scroll-margin 4)
-   '(tool-bar-mode 't)
    '(recentf-max-menu-items 20)
    '(blink-cursor-mode nil)
    '(fill-column 80)
    '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
    '(transient-mark-mode t)
-   '(f90-smart-end 'noblink)))
+   '(f90-smart-end 'noblink)
+   '(tool-bar-mode nil)))
 
 (when window-system
     (custom-set-faces
@@ -623,3 +652,5 @@ the beginning of the line."
 		    :overline nil :underline nil :slant normal
 		    :weight normal :height 120 :width normal
 		    :family "terminus")))))))
+
+(put 'scroll-left 'disabled nil)
