@@ -133,7 +133,7 @@ else
 fi
 
 # rsync
-$RSYNC -avzn --delete -e ssh $LINKDESTOPT $SOURCES "$DEST"
+$RSYNC -avz --delete -e ssh $LINKDESTOPT $SOURCES "$DEST"
 
 if [ $? -ne 0 ]
 then

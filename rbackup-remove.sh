@@ -137,12 +137,12 @@ get_user_verification()
 ################################################################################
 
 line=""
+TODELETE=""
 {
     read line
     while [ ! -z "$line" ]
     do
 	echo "About to delete: $BACKDIR/$VAULT/$line"
-	
 	
 	if [ "$ans" != "YY" ]; then
 	    ans="n"
@@ -151,17 +151,25 @@ line=""
 	
 	if [ "$ans" == "y" ] || [ "$ans" == "YY" ]
 	then
-	    echo "Deleting..."
-	    # </dev/null required to keep ssh from grabbing input from the file
-	    ssh $DESTHOST "rm -rf $BACKDIR/$VAULT/$line" </dev/null
-	    if [ $? -ne 0 ]
-	    then
-		echo "ERROR deleting $BACKDIR/$VAULT/$line !!"
-	    fi
+	    echo "Queuing for deletion..."
+	    TODELETE="$TODELETE $BACKDIR/$VAULT/$line"
 	else
 	    echo "Skipping..."
 	fi
 	read line
     done
+
 } < /tmp/rblist1.txt
 
+echo ""
+
+for path in $TODELETE
+do
+    # </dev/null required to keep ssh from grabbing input from the file
+    echo "deleting $path ..."
+    ssh $DESTHOST "rm -rf $path" </dev/null
+    if [ $? -ne 0 ]
+    then
+	echo "ERROR deleting $path !!"
+    fi
+done

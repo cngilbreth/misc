@@ -33,6 +33,8 @@
 ;;
 ;; Navigation:
 ;;
+;;     C-u C-<space>: Go to previous location of the mark.
+;;
 ;;     C-l: scroll the window so the point is centered vertically
 ;;     C-<down>, C-<up>: move cursor by 4 lines (mine)
 ;;     <next>, <prior> (i.e. page up, down): scroll 5 lines (mine)
@@ -42,6 +44,10 @@
 ;;     C-j: newline and indent
 ;;     M-j: newline and indent within comment
 ;;     C-o: insert newline and leave point before it
+;;
+;; Editing:
+;;
+;;     M-/: word completion!  I said word completion!
 ;;
 ;; Rectangles:
 ;;
@@ -65,7 +71,7 @@
 ;;
 ;;     M-.: find tag
 ;;     M-*: Go back to where you where when you invoked M-. and friends
-;;     C-x 4 .: find-tag-other-windo
+;;     C-x 4 .: find-tag-other-window
 ;;     C-x 5 .: find-tag-other-frame
 ;;
 ;;     C-u M-.: find next alternate definition of tag
@@ -80,13 +86,86 @@
 ;; Imenu:
 ;;
 ;;     S-.: find tag through imenu
+;;
+;; F90:
+;;     C-c f: f90-fill-region
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; packages
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; org-mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+     (global-set-key "\C-cl" 'org-store-link)
+     (global-set-key "\C-ca" 'org-agenda)
+     (global-set-key "\C-cb" 'org-iswitchb)
+(add-hook 'org-mode-hook 'turn-on-font-lock)  ; Org buffers only
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; SLIME
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(when (file-accessible-directory-p "~/emacs/slime")
+  (add-to-list 'load-path "~/emacs/slime")
+  (when (file-accessible-directory-p "/usr/local/lib/sbcl")
+    (setq inferior-lisp-program "/usr/local/bin/sbcl"))
+  (require 'slime)
+  (slime-setup))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CEDET and ECB
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;; CEDET
+
+(when (file-accessible-directory-p "~/emacs/cedet")
+  (add-to-list 'load-path "~/emacs/cedet/common")
+  (load-file "~/emacs/cedet/common/cedet.el")
+  (global-ede-mode 1)
+
+;; Enabling Semantic (code-parsing, smart completion) features
+;; Select one of the following:
+
+;; * This enables the database and idle reparse engines
+(semantic-load-enable-minimum-features)
+
+;; * This enables some tools useful for coding, such as summary mode
+;;   imenu support, and the semantic navigator
+(semantic-load-enable-code-helpers)
+
+;; * This enables even more coding tools such as intellisense mode
+;;   decoration mode, and stickyfunc mode (plus regular code helpers)
+;;(semantic-load-enable-gaudy-code-helpers)
+
+;; * This enables the use of Exuberent ctags if you have it installed.
+;;   If you use C++ templates or boost, you should NOT enable it.
+;; (semantic-load-enable-all-exuberent-ctags-support)
+
+;; Enable SRecode (Template management) minor-mode.
+;; (global-srecode-minor-mode 1)
+
+
+;;; ECB
+
+  (when (file-accessible-directory-p "~/emacs/ecb")
+    (add-to-list 'load-path "~/emacs/ecb")
+    (require 'ecb-autoloads)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; interface customizations
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(customize-set-variable  'msb-mode 't)
 (customize-set-variable 'tool-bar-mode 't)
 (global-font-lock-mode 't)
 (mouse-wheel-mode 't)
@@ -98,6 +177,7 @@
 
 (customize-set-variable 'auto-fill-mode 't) ; very nice in f90 mode
 
+
 (require 'recentf)
 (recentf-mode 't)
 (customize-set-variable 'recentf-exclude '("^/scp"))
@@ -106,6 +186,17 @@
   (add-to-list 'load-path "~/emacs")
   (require 'ido)
   (ido-mode 'buffers))
+
+;; http://c2.com/cgi/wiki?FixmeComment
+
+ (setq fixme-modes '(erlang-mode java-mode c-mode emacs-lisp-mode scheme-mode f90-mode))
+ (make-face 'font-lock-fixme-face)
+ (mapc (lambda (mode)
+	 (font-lock-add-keywords
+	  mode
+	  '(("\\<\\(FIXME\\)" 1 'font-lock-fixme-face t))))
+	fixme-modes)
+ (modify-face 'font-lock-fixme-face "Red" "Yellow" nil t nil t nil nil)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -127,109 +218,34 @@
 (customize-set-variable 'scheme-program-name "guile")
 (customize-set-variable 'show-paren-mode t)
 
+
+(require 'etags-select)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Mode customizations
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;(customize-set-variable 'asm-comment-char ?#)
 (defun my-asm-hook ()
   (setq asm-comment-char ?#))
 (add-hook 'asm-mode-set-comment-hook 'my-asm-hook)
 
-(require 'etags-select)
+(defun my-asm-hook1 ()
+  (local-set-key (kbd "TAB") 'indent-according-to-mode))
+(add-hook 'asm-mode-hook 'my-asm-hook1)
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keyboard macros
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(fset 'grab-energies
-   (lambda (&optional arg) "Keyboard
-   macro." (interactive "p") (kmacro-exec-ring-item (quote ([19
-   108 101 118 101 108 115 13 18 74 122 42 50 44 32 13 1 67108896
-   down down 134217847 24 111 25 return 24 111 19 108 101 118 101
-   108 115 32 58 13 down 1 67108896 19 35 13 1 134217847 24 111
-   25 24 111] 0 "%d")) arg)))
-
-
-;; To bind a keyboard macro to f6: first call kmacro-name-last-macro
-;; Then copy this line to a scratch buffer, modify and execute
-;(global-set-key [f6] 'grab-energies)
-;; I have this here because using the macro ring is sometimes difficult
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; SLIME
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(when (file-accessible-directory-p "~/emacs/slime")
-  (add-to-list 'load-path "~/emacs/slime")
-  (when (file-accessible-directory-p "/usr/local/lib/sbcl")
-    (setq inferior-lisp-program "/usr/local/bin/sbcl"))
-  (require 'slime)
-  (slime-setup))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Functions for working with ROBODOC
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defun robo-module (name description)
-  (interactive "MName of module: \nMOne-line-description: ")
-  (let ((doc
-	 (concat
-	  "!*******************************************************************************\n"
-	  "!****h*" name "/" name "\n"
-	  "! NAME" "\n"
-	  "!   " name " -- " description "\n"
-	  "!*******************************************************************************\n"
-	  "! 2008 Chris Gilbreth \n"
-	  "!*******************************************************************************\n\n")))
-    (insert doc)))
-
-(defun robo-function-extended (name description)
-  (interactive "MName of function: \nMOne-line-description: ")
-  (let ((doc
-	 (concat
-	  "!*******************************************************************************\n"
-	  "!****f* <module>" "/" name "\n"
-	  "! NAME\n"
-	  "!   " name " -- " description "\n"
-	  "! SYNOPSIS\n"
-	  "!   \n"
-	  "! INPUTS\n"
-	  "!   *  - (in) \n"
-	  "!   *  - (out) \n"
-	  "! NOTES\n"
-	  "!   \n"
-	  "!*******************************************************************************\n")))
-    (insert doc)))
-
-(defun robo-function-concise (name description)
-  (interactive "MName of function: \nMOne-line-description: ")
-  (let ((doc
-	 (concat
-	  "!*******************************************************************************\n"
-	  "!****f* <module>" "/" name "\n"
-	  "! NAME\n"
-	  "!   " name " -- " description "\n"
-	  "! NOTES\n"
-	  "!   \n"
-	  "!*******************************************************************************\n")))
-    (insert doc)))
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Fortran helper routines
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun fortran-add-variable (name type)
-  (interactive "MName of variable: \nMType (including kind): ")
-  (message "You typed %s and %s" name type))
-
-(defvar line-comment-length 40)
-(defun fortran-add-line-comment (str)
-  (interactive "Mstring: ")
-  (insert (concat "!-- " str " "))
-  (insert-char (aref "-" 0) (- line-comment-length (length str) 6))
-  (insert "!"))
-
-		  
-		  
 
 ;; To replace single-precision literals with double-precision ones
 ;; in fortran code
@@ -241,10 +257,10 @@
   (query-replace-regexp "\\([0-9]+\\.[0-9Ee+-]+\\)\\(_sp\\)?" "\\1_dp"))
 
 
-
-
-
-
+(defun insert-to-end (char)
+  (interactive "Mcharacter: ")
+  (insert-char (aref char 0) (- 80 (current-column))))
+  
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Random stuff
@@ -258,9 +274,6 @@
   (replace-regexp "^\\([0-9]\\)" "$\\1$" nil point (+ mark 40))
   (replace-regexp "\\([0-9.]\\)	*$" "\\1\\\\\\\\
     \\\\hline" nil point (+ mark 100))) 
-
-
-
 
 
 
@@ -416,6 +429,10 @@ the beginning of the line."
     (if (eql p (point))
 	(beginning-of-line))))
 
+(defun insert-stars ()
+  (interactive)
+  (insert-to-end "*"))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keyboard Shortcuts
@@ -423,6 +440,11 @@ the beginning of the line."
 
 (global-set-key (kbd "s-.") 'imenu)
 (global-set-key [f9] 'next-error)
+
+(global-set-key (kbd "C-*") 'insert-stars)
+
+(global-set-key (kbd "C-;") 'comment-region)
+(global-set-key (kbd "C-M-;") 'uncomment-region)
 
 (add-hook 'python-mode-hook 
 	  '(lambda () (local-set-key [f1] 'python-complete-symbol)))
@@ -448,6 +470,10 @@ the beginning of the line."
 
 (global-set-key (kbd "C-<down>")    'my-forward-lines)
 (global-set-key (kbd "C-<up>")      'my-backward-lines)
+(global-set-key (kbd "M-<down>")    'forward-paragraph)
+(global-set-key (kbd "M-<up>")      'backward-paragraph)
+(global-set-key (kbd "A-<down>")    'forward-paragraph)
+(global-set-key (kbd "A-<up>")      'backward-paragraph)
 
 (global-set-key (kbd "C-x C-a")     'recentf-open-files)
 
@@ -490,23 +516,23 @@ the beginning of the line."
 ;(add-hook 'python-mode-hook
 ;	  '(lambda () (define-key python-mode-map "\C-m" 'newline-and-indent)))
 
-(when (file-accessible-directory-p "~/emacs/python-mode-1.0-patched")
-    (add-to-list 'load-path "~/emacs/python-mode-1.0-patched/")
-    (autoload 'python-mode "python-mode" "Python Mode." t)
-    (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
-    (add-to-list 'interpreter-mode-alist '("python" . python-mode)))
+;; (when (file-accessible-directory-p "~/emacs/python-mode-1.0-patched")
+;;     (add-to-list 'load-path "~/emacs/python-mode-1.0-patched/")
+;;     (autoload 'python-mode "python-mode" "Python Mode." t)
+;;     (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
+;;     (add-to-list 'interpreter-mode-alist '("python" . python-mode)))
 
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Autosave files.
+;; Autosave and backup files.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Put autosave files (ie #foo#) in one place, *not*
 ;; scattered all over the file system!
 
 (defvar autosave-dir
- (concat "/tmp/emacs_autosaves/" (user-login-name) "/"))
+ (concat "/home/" (user-login-name) "/.backups/"))
 (make-directory autosave-dir t)
 
 (defun auto-save-file-name-p (filename)
@@ -522,22 +548,8 @@ the beginning of the line."
 ;; Put backup files (ie foo~) in one place too. (The backup-directory-alist
 ;; list contains regexp=>directory mappings; filenames matching a regexp are
 ;; backed up in the corresponding directory. Emacs will mkdir it if necessary.)
-(defvar backup-dir (concat "/tmp/emacs_backups/" (user-login-name) "/"))
-
-(setq backup-directory-alist (list (cons "." backup-dir)))
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Color-theme
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;(when (and window-system
-;	   (file-accessible-directory-p "~/local/emacs/color-theme-6.6.0"))
-;  (add-to-list 'load-path "~/local/emacs/color-theme-6.6.0")
-;  (require 'color-theme)
-;  (color-theme-initialize)
-;  (color-theme-feng-shui))
+(defvar backup-dir (concat "/home/" (user-login-name) "/.backups"))
+(setq backup-directory-alist (list (cons ".*" backup-dir)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -565,43 +577,30 @@ the beginning of the line."
 ;; Common customizations
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when 't
-  (custom-set-variables
-   '(scroll-conservatively 0)
-   '(scroll-margin 4)
-   '(scroll-step 6)
-   '(visual-scroll-margin 4)
-   '(recentf-max-menu-items 20)
-   '(blink-cursor-mode nil)
-   '(fill-column 80)
-   '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
-   '(transient-mark-mode t)
-   '(f90-smart-end 'noblink)
-   '(tool-bar-mode nil)))
-
 (when window-system
-    (custom-set-faces
-     ;; custom-set-faces was added by Custom.
-     ;; If you edit it by hand, you could mess it up, so be careful.
-     ;; Your init file should contain only one such instance.
-     ;; If there is more than one, they won't work right.
-     '(default ((t (:stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil \.\.\.))))
-     '(font-lock-builtin-face ((((class color) (min-colors 88) (background light)) (:underline t))))
-     '(font-lock-comment-delimiter-face ((default (:inherit font-lock-comment-face)) (((class color) (min-colors 16)) nil)))
-     '(font-lock-comment-face ((t (:foreground "#830000" :slant italic))))
-     '(font-lock-constant-face ((((class color) (min-colors 88) (background light)) (:foreground "#0F0051"))))
-     '(font-lock-doc-face ((t (:inherit font-lock-string-face))))
-     '(font-lock-function-name-face ((((class color) (min-colors 88) (background light)) (:box (:line-width 1 :color "grey50") :weight bold))))
-     '(font-lock-keyword-face ((t (:foreground "#0F0051" :weight bold))))
-     '(font-lock-negation-char-face ((t (:foreground "DarkRed"))))
-     '(font-lock-regexp-grouping-backslash ((t (:inherit bold :foreground "DarkCyan"))))
-     '(font-lock-regexp-grouping-construct ((t (:inherit bold :foreground "DarkCyan"))))
-     '(font-lock-string-face ((((class color) (min-colors 88) (background light)) (:foreground "#977563"))))
-     '(font-lock-type-face ((((class color) (min-colors 88) (background light)) (:underline "grey50" :weight bold))))
-     '(font-lock-variable-name-face ((((class color) (min-colors 88) (background light)) (:foreground "#1E3149"))))
-     '(mode-line ((t (:background "#f6f6f6" :foreground "grey10" :box (:line-width 1 :color "grey50")))))
-     '(mode-line-inactive ((default (:inherit mode-line :foreground "grey30")) (((class color) (min-colors 88) (background light)) nil)))
-     '(region ((((class color) (min-colors 88) (background light)) (:background "#BDD5FC"))))))
+  (custom-set-faces
+   '(default ((t (:stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil \.\.\.))))
+   '(font-lock-builtin-face ((((class color) (min-colors 88) (background light)) (:underline t))))
+   '(font-lock-comment-delimiter-face ((default (:inherit font-lock-comment-face)) (((class color) (min-colors 16)) nil)))
+   '(font-lock-comment-face ((t (:foreground "#830000" :slant italic))))
+   '(font-lock-constant-face ((((class color) (min-colors 88) (background light)) (:foreground "#0F0051"))))
+   '(font-lock-doc-face ((t (:inherit font-lock-string-face))))
+   '(font-lock-function-name-face ((((class color) (min-colors 88) (background light)) (:box (:line-width 1 :color "grey50") :weight bold))))
+   '(font-lock-keyword-face ((t (:foreground "#0F0051" :weight bold))))
+   '(font-lock-negation-char-face ((t (:foreground "DarkRed"))))
+   '(font-lock-regexp-grouping-backslash ((t (:inherit bold :foreground "DarkCyan"))))
+   '(font-lock-regexp-grouping-construct ((t (:inherit bold :foreground "DarkCyan"))))
+   '(font-lock-string-face ((((class color) (min-colors 88) (background light)) (:foreground "dark slate grey"))))
+   '(font-lock-type-face ((((class color) (min-colors 88) (background light)) (:underline "grey50" :weight bold))))
+   '(font-lock-variable-name-face ((((class color) (min-colors 88) (background light)) (:foreground "#1E3149"))))
+   '(mode-line ((t (:background "#f6f6f6" :foreground "grey10" :box (:line-width 1 :color "grey50")))))
+   '(mode-line-inactive ((default (:inherit mode-line :foreground "grey30")) (((class color) (min-colors 88) (background light)) nil)))
+   '(ps-footer-font-size (quote (10 . 10)))
+   '(ps-header-font-size (quote (10 . 10)))
+   '(ps-header-title-font-size (quote (10 . 10)))
+   '(region ((((class color) (min-colors 88) (background light)) (:background "#BDD5FC"))))
+   '(sh-heredoc ((((class color) (background light)) (:foreground "dark slate gray"))))))
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -630,27 +629,54 @@ the beginning of the line."
 (when (string= (system-name) "Winter")
   (customize-set-variable 'lpr-command "gtklp")
   (customize-set-variable 'ps-lpr-command "gtklp")
-  (when window-system
-    (custom-set-faces
-     ;; custom-set-faces was added by Custom.
-     ;; If you edit it by hand, you could mess it up, so be careful.
-     ;; Your init file should contain only one such instance.
-     ;; If there is more than one, they won't work right.
-     '(default ((t (:stipple nil :background "#ffffff" :foreground "black"
-		    :inverse-video nil :box nil :strike-through nil
-		    :overline nil :underline nil :slant normal
-		    :weight normal :height 120 :width normal
-		    :family "terminus")))))
 
-    (custom-set-variables
-     ;; custom-set-variables was added by Custom.
-     ;; If you edit it by hand, you could mess it up, so be careful.
-     ;; Your init file should contain only one such instance.
-     ;; If there is more than one, they won't work right.
-     '(default ((t (:stipple nil :background "#ffffff" :foreground "black"
-		    :inverse-video nil :box nil :strike-through nil
-		    :overline nil :underline nil :slant normal
-		    :weight normal :height 120 :width normal
-		    :family "terminus")))))))
+  (customize-set-variable 'ecb-primary-secondary-mouse-buttons (quote mouse-1--mouse-2))
+  (customize-set-variable 'ecb-layout-window-sizes 
+			  (quote (("left8" (0.18181818181818182
+					    . 0.2878787878787879) (0.18181818181818182
+					    . 0.24242424242424243) (0.18181818181818182
+					    . 0.2878787878787879) (0.18181818181818182
+					    . 0.16666666666666666))))))
 
-(put 'scroll-left 'disabled nil)
+;;;****************************************************************************
+;;; Automatic emacs customizations
+;;;****************************************************************************
+
+(custom-set-variables
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(blink-cursor-mode nil)
+ '(column-number-mode t)
+ '(directory-free-space-program "df")
+ '(dired-listing-switches "-alh")
+ '(ecb-auto-update-methods-after-save nil)
+ '(ecb-expand-methods-switch-off-auto-expand nil)
+ '(ecb-non-semantic-methods-initial-expand (quote (f90-mode)))
+ '(ecb-options-version "2.40" t)
+ '(ecb-source-file-regexps (quote ((".*" ("\\(^\\(\\.\\|#\\)\\|\\(~$\\|\\.\\(elc\\|obj\\|o\\|class\\|lib\\|dll\\|a\\|so\\|mod\\|cache\\)$\\)\\)") ("^\\.\\(emacs\\|gnus\\)$")))))
+ '(ecb-source-path (quote (("/home/chris/Projects/diag2/src" "diag2") ("/home/chris/Projects/afmc/current/source" "afmc") ("/home/chris/Projects/contact_int/src" "contact_int") ("/" "/") ("/home/chris/Projects/QHS" "QHS") ("/home/chris/Projects/QM/src" "QM") ("/home/chris/Projects/diag3/src" "diag3") ("/home/chris/Documents/Research/coldatom/code" "coldatom code") ("/home/chris/Projects/sym/src" "sym") ("/home/chris/Projects/exact_therm/src" "exact_therm"))))
+ '(ecb-stealthy-tasks-delay 0.2)
+ '(eshell-prompt-function (lambda nil (concat (eshell/basename (eshell/pwd)) (if (= (user-uid) 0) " # " " $ "))))
+ '(f90-smart-end (quote noblink))
+ '(fill-column 80)
+ '(grep-command "grep -nH -r -i -e ")
+ '(list-directory-verbose-switches "-l")
+ '(ps-footer-font-size (quote (9 . 9)))
+ '(ps-header-font-size (quote (9 . 9)))
+ '(ps-header-title-font-size (quote (10 . 10)))
+ '(recentf-max-menu-items 20)
+ '(save-place t nil (saveplace))
+ '(scroll-bar-mode (quote right))
+ '(scroll-conservatively 0)
+ '(scroll-margin 0)
+ '(scroll-step 6)
+ '(sentence-end-double-space nil)
+ '(show-paren-mode t)
+ '(tex-dvi-view-command (quote (cond ((eq window-system (quote x)) "evince") ((eq window-system (quote w32)) "yap") (t "dvi2tty * | cat -s"))))
+ '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
+ '(tool-bar-mode nil)
+ '(visual-scroll-margin 0)
+ '(x-select-enable-clipboard t))
+

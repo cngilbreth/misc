@@ -36,6 +36,30 @@ get_user_verification()
     done
 } <&1
 
+get_answer()
+# Input: $1 = "Do you want to do blah, bloop or bleep? (blah/bloop/bleep)"
+#        $2 = "blah bloop bleep"
+{
+    ans=""
+    found=0
+    while [ $found -ne 1 ]
+    do
+	echo -n "$1: "
+	read ans
+	for str in $2
+	do
+	    if [ "$ans" == "$str" ]; then
+		found=1
+		break
+	    fi
+	done
+	if [ $found -ne 1 ]; then
+	    echo "Answer must be one of: $2"
+	fi
+    done
+} <&1
+
+
 check_last_cmd()
 {
     if [ $? -ne 0 ]; then

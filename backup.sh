@@ -1,6 +1,8 @@
 #!/bin/bash
 # backup.sh -- backup directories to remote storage
 
+PATH=/home/chris/bin:$PATH
+
 ################################################################################
 # Process command line args
 ################################################################################
@@ -37,12 +39,11 @@ then
     VAULT="macbook"
 
 elif [ "$HOST" == "Winter" ]
-# NOTE: Switched Winter to use the Autumn vault on Jun 1, 2008
 then
     SOURCES="/home/chris/Desktop /home/chris/bin /home/chris/Projects \
 /home/chris/Documents /home/chris/.TeXmacs /home/chris/.emacs \
 /home/chris/.bashrc /home/chris/.bash_profile /home/chris/emacs"
-    VAULT="autumn"
+    VAULT="winter"
 
 elif [ "$HOST" == "bethe.physics.yale.edu" ]
 then
@@ -115,7 +116,7 @@ backup()
 
 remove_extras()
 {
-    rbackup-remove.sh -v $VAULT 4 $REMOTE_DEST
+    rbackup-remove.sh -v $VAULT 2 $REMOTE_DEST
 }
 
 list_backups()
