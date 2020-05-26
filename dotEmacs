@@ -1,0 +1,1089 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Notes
+;;
+;; Kill emacs damon: emacsclient -e '(kill-emacs)'
+;;
+;; Files:
+;;
+;;     open a recent file (recentf): C-x C-a
+;;
+;;     remote paths OR directories:
+;;         ftp: C-x C-f /user@host:/path/to/file-or-dir
+;;         ssh: C-x C-f /ssh:user@host:/path/to/whatever
+;;         sftp doesn't seem to work.
+;;
+;; Dired:
+;;
+;;     C-x d  to Dired a directory (compare C-x f to find-file)
+;;
+;;     ? for mini help
+;;     h for help
+;;
+;;     m to mark a file
+;;     u to unmark; U to unmark all
+;;     D to delete marked files
+;;     R to rename a single file
+;;     R to move several files
+;;
+;;     d to mark for deletion
+;;     x to expunge files marked for deletion
+;;
+;;     i (over a directory) to insert it into current view
+;;     v to view a file in read-only mode
+;;     q to quit window (including view windows)
+;;
+;;     g or f5 refresh (f5 is mine)
+;;
+;;     ... lots of others (type h)
+;;
+;;
+;; Navigation:
+;;
+;;     C-u C-<space>  Go to previous location of the mark.
+;;
+;;     C-l  scroll the window so the point is centered vertically
+;;     C-<down>, C-<up>  move cursor by 4 lines (mine)
+;;     <next>, <prior>  (i.e. page up, down): scroll 10% (mine)
+;;     M-<next>, M-<prior>  scroll 50% (mine)
+;;     M-f  forward-whitespace (mine)
+;;
+;;     C-j  newline and indent
+;;     M-j  newline and indent within comment
+;;     C-o  insert newline and leave point before it
+;;
+;; Editing:
+;;
+;;     M-/ word completion!  I said word completion!
+;;     C-x C-;   Comment-region or Uncomment-region
+;;
+;; Find/Replace in multiple files:
+;;
+;;  (1) M-x find-name-dired: you will be prompted for a root directory
+;;      and a filename pattern.
+;;  (2) Press t to "toggle mark" for all files found.
+;;  (3) Press Q for "Query-Replace in Files...": you will be prompted for
+;;      query/substitution regexps.
+;;  (4) Proceed as with query-replace-regexp: SPACE to replace and move to
+;;      next match, n to skip a match, etc.
+;;
+;; Rectangles:
+;;
+;;     C-x r k: kill rectangle
+;;     C-x r y: yank rectangle
+;;
+;;     C-x r r: copy rectangle to register
+;;     C-x r i: insert register (general command)
+;;
+;;     C-x r d: delete rectangle
+;;     C-x r c: clear rectangle
+;;     C-x r o: open rectangle (shift text right to create open space)
+;;
+;; Cleaning up whitespace:
+;;
+;;     C-u 1 M-x whitespace-buffer
+;;     ;; Above finds whitespace problems. Can then call
+;;     M-x whitespace-cleanup
+;;
+;; xref:
+;;
+;;     M-.    xref find definitions
+;;     M-,    Go back to where you where when you invoked M-. and friends
+;;     M-?    xref-find-references
+;;     C-M-.  xref-find-apropos
+;;
+;;     C-x 4 .  xref-find-definitions-other-window
+;;     C-x 5 .  xref-find-definitions-other-frame
+;;
+;;     C-u M-.    find next alternate definition of tag
+;;     M-.        go back to previous found tag
+;;     C-M-.      find-tag-regexp
+;;     C-u C-m    find next tag whose name matches regexp
+;;
+;;     M-x tags-search
+;;
+;; Imenu:
+;;
+;;     S-.  find tag through imenu
+;;
+;; F90:
+;;     C-c f  f90-fill-region
+;;
+;; Shell commands:
+;;
+;;     M-!  Execute shell command (will block emacs while running)
+;;          - Prefix C-u: Insert output into current buffer
+;;     M-&  Asynchronous shell command (won't block)
+;;          - Prefix C-u: Insert output into current buffer
+;;     M-|  Shell command on region
+;;          - Prefix C-u: Replace region with output
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Menus:
+;;
+;; - The data structure for a menu is called a "keymap"
+;;
+;; - Given a keymap, a menu can be displayed at a particular location on the
+;;   screen with x-popup-menu:
+;;      (x-popup-menu t (mouse-menu-major-mode-map))
+;;   This will display major mode mouse menu at the current location of the
+;;   mouse cursor (indicated by 't'). Instead of 't' a window location can be
+;;   specified.
+;;
+;; - References:
+;;
+;;  http://www.gnu.org/s/Emacs/manual/html_node/elisp/Pop_002dUp-Menus.html
+;;
+;;  "Usage note: Don't use x-popup-menu to display a menu if you could do the
+;;  job with a prefix key defined with a menu keymap." I think we still want
+;;  x-popup-menu though.
+;;
+;;  http://www.gnu.org/s/Emacs/manual/html_node/elisp/Menu-Keymaps.html#Menu-Keymaps
+;;
+;;  http://www.gnu.org/s/Emacs/manual/html_node/elisp/Keymaps.html#Keymaps
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Ideas: "easy-mode"
+;;
+;; o Right-click/ctrl-enter/alt-enter popup context menu.
+;;   Example entries:
+;;   - Comment-region and uncomment-region
+;;   - Rectangle commands (submenu)
+;;   - Evaluate region
+;;   - Search and replace, regexp search and replace (in region if appropriate)
+;;   - Indent-region
+;;   - Go to definition of variable
+;;   - Go back & forward
+;;   - LaTeX shortcuts
+;;   - Math & greek symbols
+;;   - Cut and paste, paste next in ring
+;;   - Insert registers
+;;   - etc. etc. !!
+;;
+;;  It's a bit crazy fumbling with all the emacs shortcuts. A keyboard-enabled
+;;  menu could be simpler to use.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; magit                                                                      ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(global-set-key (kbd "C-x g") 'magit-status)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; misc                                                                       ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(add-to-list 'load-path "~/Emacs/better-defaults/")
+(require 'better-defaults)
+
+(setq inhibit-default-init 't)
+
+(setq ring-bell-function 'ignore)
+
+(minibuffer-depth-indicate-mode t)
+
+(defun name-of-the-buffer ()
+  "Gets the name of the file the current buffer is based on."
+  (interactive)
+  (insert (buffer-name (window-buffer (minibuffer-selected-window)))))
+
+(global-set-key (kbd "C-c b") 'name-of-the-buffer)
+(global-set-key (kbd "<C-tab>") 'other-window)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; isearch                                                                    ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;; This will make isearch leave the cursor at the beginning of the match, not
+;; the end (which depends on how many characters typed)
+
+(defun my-goto-match-beginning ()
+  (when (and isearch-forward isearch-other-end (not isearch-mode-end-hook-quit))
+    (goto-char isearch-other-end)))
+
+(defadvice isearch-exit (after my-goto-match-beginning activate)
+  "Go to beginning of match."
+  (when (and isearch-forward isearch-other-end)
+    (goto-char isearch-other-end)))
+
+(add-hook 'isearch-mode-end-hook 'my-goto-match-beginning)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Recentf                                                                    ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(require 'recentf)
+(recentf-mode 't)
+;(customize-set-variable 'recentf-exclude '("^/scp"))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ido                                                                        ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(defun ido-recentf-open ()
+  "Use `ido-completing-read' to \\[find-file] a recent file"
+  (interactive)
+  (if (find-file (ido-completing-read "Find recent file: " recentf-list))
+      (message "Opening file...")
+    (message "Aborting")))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Packages                                                                   ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
+
+(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")))
+
+(autoload 'wolfram-mode "wolfram-mode" nil t)
+(autoload 'run-wolfram "wolfram-mode" nil t)
+(setq wolfram-program "/usr/local/bin/MathKernel9")
+(add-to-list 'auto-mode-alist '("\\.m$" . wolfram-mode))
+
+;; Enhanced package menu: Paradox
+
+(setq paradox-github-token "bf4ee267244c6df4d6fc14db5013f4b1b3de0cf6")
+;(require 'paradox)
+;;(paradox-enable)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Execution path for emacs in OS X                                           ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (memq window-system '(mac ns))
+  (exec-path-from-shell-initialize))
+(add-to-list 'exec-path "/usr/local/bin")
+(add-to-list 'exec-path "/Users/Chris/Bin")
+
+;; pdf-tools
+;(require 'pdf-tools)
+;(pdf-loader-install)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; doc-view                                                                   ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Using pdf-tools now instead
+
+;; (defun doc-view-rotate-current-page ()
+;;   "Rotate the current page by 90 degrees.  Requires ImageMagick installation"
+;;   (interactive)
+;;   (when (eq major-mode 'doc-view-mode)
+;;     ;; we are assuming current doc-view internals about cache-names
+;;     (let ((file-name (expand-file-name (format "page-%d.png" (doc-view-current-page)) (doc-view--current-cache-dir))))
+;;       ;; assume imagemagick is installed and rotate file in-place and redisplay buffer
+;;       (call-process-shell-command "convert" nil nil nil "-rotate" "90" (concat "\"" file-name "\"") (concat "\"" file-name "\""))
+;;       (clear-image-cache)
+;;       (doc-view-goto-page (doc-view-current-page)))))
+
+;; (global-set-key (kbd "C-c r") 'doc-view-rotate-current-page)
+
+;; (add-hook 'doc-view-mode-hook
+;;           (lambda () (local-set-key (kbd "g") 'doc-view-refresh-and-redisplay)))
+
+;; (add-hook 'doc-view-mode-hook
+;;           (lambda () (local-set-key (kbd "g") 'auto-revert-mode)))
+
+;; (defun doc-view-refresh-and-redisplay ()
+;;   (interactive)
+;;   (progn
+;;     (doc-view-fit-page-to-window)
+;;     (doc-view-revert-buffer nil t)
+;;     (clear-image-cache)
+;;     ;; Redisplay page
+;;     (doc-view-goto-page (doc-view-current-page))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Functions                                                                  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(defun rename-current-buffer-file ()
+  "Renames current buffer and file it is visiting."
+  (interactive)
+  (let* ((name (buffer-name))
+        (filename (buffer-file-name))
+        (basename (file-name-nondirectory filename)))
+    (if (not (and filename (file-exists-p filename)))
+        (error "Buffer '%s' is not visiting a file!" name)
+      (let ((new-name (read-file-name "New name: " (file-name-directory filename) basename nil basename)))
+        (if (get-buffer new-name)
+            (error "A buffer named '%s' already exists!" new-name)
+          (rename-file filename new-name 1)
+          (rename-buffer new-name)
+          (set-visited-file-name new-name)
+          (set-buffer-modified-p nil)
+          (message "File '%s' successfully renamed to '%s'"
+                   name (file-name-nondirectory new-name)))))))
+
+(global-set-key (kbd "C-x C-r") 'rename-current-buffer-file)
+
+(defun to-markdown ()
+  (interactive)
+  (progn
+    (beginning-of-buffer)
+    (query-replace-regexp "<a href=\"\\(.+?\\)\">\\(.+?\\)</a>" "[\\2](\\1)")
+    (beginning-of-buffer)
+    (query-replace-regexp "\\\\( *\\(.+?\\) *\\\\)" "$\\1$")
+    (beginning-of-buffer)
+    (query-replace-regexp "</?p>" "")
+    (beginning-of-buffer)
+    (query-replace-regexp "</?br>" "")))
+
+(defun unfill-paragraph ()
+  (interactive)
+  (let ((fill-column (point-max)))
+  (fill-paragraph nil)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Directory for emacs programs                                               ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(add-to-list 'load-path (expand-file-name "~/Emacs"))
+
+(exec-path-from-shell-copy-env "PYTHONPATH")
+
+;(require 'julia-mode)
+
+(load "~/Emacs/ESS/lisp/ess-site")
+;;(setq inferior-julia-program-name "/path/to/julia/julia")
+
+;(setenv "PATH" "/Users/chris/bin:/Users/chris/Bin:/home/cng/Bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin")
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; GPG                                                                        ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;(setq auth-source-debug t)
+(setenv "GPG_AGENT_INFO" nil)
+(setq epa-pinentry-mode 'loopback)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Whitespace customizations                                                  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(make-variable-buffer-local 'before-save-hook)
+(add-hook 'fortran-mode-hook
+          (lambda () (add-hook 'before-save-hook 'whitespace-cleanup)))
+(add-hook 'f90-mode-hook
+          (lambda () (add-hook 'before-save-hook 'whitespace-cleanup)))
+(add-hook 'python-mode-hook
+          (lambda () (add-hook 'before-save-hook 'whitespace-cleanup)))
+(add-hook 'javaq-mode-hook
+          (lambda () (add-hook 'before-save-hook 'whitespace-cleanup)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; LaTeX                                                                      ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(add-hook 'latex-mode-hook
+          '(lambda () (visual-line-mode t)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; C customizations                                                           ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Does this work for C++?
+(add-hook 'c-mode-hook
+          '(lambda ( )
+             (c-set-style "k&r")         ;; Kernihan & Richie's style
+             (setq tab-width 8)          ;; tab is 8 spaces
+             (setq c-basic-offset 4)     ;; indent is 4 spaces
+             (c-set-offset 'substatement-open 0) ;; No indent for open bracket
+             (setq indent-tabs-mode nil) ;; only use spaces for indenting.
+             ))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Passwords                                                                  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(require 'password-mode)
+(add-hook 'text-mode-hook 'password-mode)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; gnuplot                                                                    ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; (require 'gnuplot)
+;; (if (eq system-type 'darwin)
+;;     (setq gnuplot-program "/usr/local/bin/gnuplot")
+;;   (setq gnuplot-program (expand-file-name "~/local/bin/gnuplot")))
+
+(setq auto-mode-alist
+       (append '(("\\.\\(gp\\|plt\\|gnuplot\\)$" . gnuplot-mode)) auto-mode-alist))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; symbol.py
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(load "symbol")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; markdown-mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(autoload 'markdown-mode "markdown-mode"
+   "Major mode for editing Markdown files" t)
+(add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; org-mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+     (global-set-key "\C-cl" 'org-store-link)
+     (global-set-key "\C-ca" 'org-agenda)
+     (global-set-key "\C-cb" 'org-iswitchb)
+
+(add-hook 'org-mode-hook 'turn-on-font-lock)
+(add-hook 'org-mode-hook (lambda () (setq comment-start nil)))
+
+(add-to-list 'auto-mode-alist '("README$" . org-mode))
+;;(setq default-major-mode 'org-mode)
+;; C-k is killing whole subtrees! I lost my work!
+;; (setq org-special-ctrl-k t) before losing your work.
+(setq org-special-ctrl-k t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; AUCTEX
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;(when (file-accessible-directory-p "~/Emacs/auctex")
+;  (add-to-list 'load-path "~/Emacs/auctex")
+;  (load "auctex.el" nil t t)
+;  (load "preview-latex.el" nil t t))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CEDET and ECB
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Load CEDET.
+;; See cedet/common/cedet.info for configuration details.
+;; IMPORTANT: For Emacs >= 23.2, you must place this *before* any
+;; CEDET component (including EIEIO) gets activated by another
+;; package (Gnus, auth-source, ...).
+;(load-file "~/Emacs/cedet/common/cedet.el")
+
+;; Enable EDE (Project Management) features
+;(global-ede-mode 1)
+
+;; Enable EDE for a pre-existing C++ project
+;; (ede-cpp-root-project "NAME" :file "~/myproject/Makefile")
+
+;; Enabling Semantic (code-parsing, smart completion) features
+;; Select one of the following:
+
+;; * This enables the database and idle reparse engines
+;(semantic-load-enable-minimum-features)
+
+;; * This enables some tools useful for coding, such as summary mode,
+;;   imenu support, and the semantic navigator
+;(semantic-load-enable-code-helpers)
+
+;; * This enables even more coding tools such as intellisense mode,
+;;   decoration mode, and stickyfunc mode (plus regular code helpers)
+;; (semantic-load-enable-gaudy-code-helpers)
+
+;; * This enables the use of Exuberant ctags if you have it installed.
+;;   If you use C++ templates or boost, you should NOT enable it.
+;; (semantic-load-enable-all-exuberent-ctags-support)
+;;   Or, use one of these two types of support.
+;;   Add support for new languages only via ctags.
+;; (semantic-load-enable-primary-exuberent-ctags-support)
+;;   Add support for using ctags as a backup parser.
+;; (semantic-load-enable-secondary-exuberent-ctags-support)
+
+;; Enable SRecode (Template management) minor-mode.
+;; (global-srecode-minor-mode 1)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; interface customizations
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;(setq frame-title-format "%b - emacs")
+(menu-bar-mode 1)
+(show-paren-mode 1)
+(customize-set-variable  'msb-mode 't)
+;;(customize-set-variable 'tool-bar-mode 't)
+(global-font-lock-mode 't)
+(when window-system (mouse-wheel-mode 't))
+(column-number-mode 't)
+(blink-cursor-mode 0)
+(visual-line-mode 't)
+(setq transient-mark-mode 't)
+(setq inhibit-startup-message 't)
+(customize-set-variable 'scroll-bar-mode 'right)
+(customize-set-variable 'auto-fill-mode 't) ; very nice in f90 mode
+(customize-set-variable 'fill-column 80)
+
+(setq fixme-modes '(erlang-mode java-mode c-mode emacs-lisp-mode scheme-mode
+                                f90-mode latex-mode LaTeX-mode python-mode Python-mode))
+(make-face 'font-lock-fixme-face)
+(make-face 'font-lock-todo-face)
+(make-face 'font-lock-wip-face)
+(mapc (lambda (mode)
+        (font-lock-add-keywords
+         mode
+         '(("\\<\\(FIXME\\)" 1 'font-lock-fixme-face t)
+           ("\\<\\(TODO\\)" 1 'font-lock-todo-face t)
+           ("\\<\\(WIP\\)" 1 'font-lock-wip-face t))))
+      fixme-modes)
+(modify-face 'font-lock-fixme-face "Red" "Yellow" nil t nil t nil nil)
+(modify-face 'font-lock-todo-face "Blue" "White" nil t nil t nil nil)
+(modify-face 'font-lock-wip-face "White" "Blue" nil t nil t nil nil)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Etags-select                                                               ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(require 'xref)
+;;(require 'etags-select)
+;;(global-set-key "\M-?" 'etags-select-find-tag-at-point)
+;;(global-set-key "\M-." 'etags-select-find-tag)
+
+;; Automatically find TAGS tables (works beautifully!)
+(require 'etags-table)
+(customize-set-variable 'etags-table-search-up-depth 4)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Mode customizations
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;(customize-set-variable 'asm-comment-char ?#)
+(defun my-asm-hook ()
+  (setq asm-comment-char ?#))
+(add-hook 'asm-mode-set-comment-hook 'my-asm-hook)
+
+(defun my-asm-hook1 ()
+  (local-set-key (kbd "TAB") 'indent-according-to-mode))
+(add-hook 'asm-mode-hook 'my-asm-hook1)
+
+(defun my-text-mode-hook ()
+  (setq comment-start "#")
+  (setq comment-style 'indent)
+  (setq comment-padding "")
+  (visual-line-mode))
+(add-hook 'text-mode-hook 'my-text-mode-hook)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Random stuff
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun insert-to-end (char)
+  "Insert a character until the end of line (col 80)."
+  (interactive "MInsert-to-end character: ")
+  (insert-char (aref char 0) (- 80 (current-column))))
+
+;; For making latex tables from tab-separated data
+;; Really sloppy
+(defun munge (point mark)
+  (interactive "r")
+  (replace-regexp "\\([0-9.-]\\)	\\([0-9-]\\)" "\\1 & \\2" nil point mark)
+  (replace-regexp "^\\([0-9]\\)" "$\\1$" nil point (+ mark 40))
+  (replace-regexp "\\([0-9.]\\)	*$" "\\1\\\\\\\\
+    \\\\hline" nil point (+ mark 100)))
+
+(defun count-words (start end)
+    "Print number of words in the region."
+    (interactive "r")
+    (save-excursion
+      (save-restriction
+        (narrow-to-region start end)
+        (goto-char (point-min))
+        (count-matches "\\sw+"))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Keyboard Shortcuts
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(global-set-key (kbd "<end>") 'end-of-line)
+(global-set-key (kbd "<home>") 'beginning-of-line)
+
+(global-set-key (kbd "M-Q") 'unfill-paragraph)
+
+(global-set-key (kbd "s-.") 'imenu)
+(global-set-key [f9] 'next-error)
+(global-set-key [f8] 'previous-error)
+
+(global-set-key (kbd "C-c e") 'insert-to-end)
+;;(global-set-key (kbd "C-c *") 'insert-stars)
+;;(global-set-key (kbd "C-c #") 'insert-pounds)
+;;(global-set-key (kbd "C-c SPC") 'insert-spaces)
+
+(add-hook 'python-mode-hook
+          '(lambda () (local-set-key [f1] 'python-complete-symbol)))
+
+;;(global-set-key (kbd "C-<backspace>") 'my-backward-kill-word)
+(global-set-key (kbd "M-d") 'my-kill-word)
+(global-set-key (kbd "C-<delete>") 'my-kill-word)
+(global-set-key (kbd "M-<delete>") 'my-kill-word)
+
+(global-set-key (kbd "C-<right>") 'my-forward-word)
+(global-set-key (kbd "C-<left>")  'my-backward-word)
+
+(global-set-key (kbd "M-<right>") 'my-forward-whitespace)
+(global-set-key (kbd "M-<left>")  'my-backward-whitespace)
+
+(global-set-key (kbd "C-,") 'my-beginning-of-line)
+(global-set-key [f5] 'my-revert-buffer)
+(global-set-key [f6] 'compile)
+(global-set-key [f7] 'recompile)
+
+(global-set-key (kbd "<next>")      'my-scroll-up)
+(global-set-key (kbd "<prior>")     'my-scroll-down)
+(global-set-key (kbd "M-<next>")    'my-mega-scroll-up)
+(global-set-key (kbd "M-<prior>")   'my-mega-scroll-down)
+
+(global-set-key (kbd "C-<down>")    'my-forward-lines)
+(global-set-key (kbd "C-<up>")      'my-backward-lines)
+(global-set-key (kbd "M-n")         'forward-paragraph)
+(global-set-key (kbd "M-p")         'backward-paragraph)
+(global-set-key (kbd "M-<down>")    'forward-paragraph)
+(global-set-key (kbd "M-<up>")      'backward-paragraph)
+(global-set-key (kbd "A-<down>")    'forward-paragraph)
+(global-set-key (kbd "A-<up>")      'backward-paragraph)
+
+;; NOTE This conflicts with gdb keybindings.
+(global-set-key (kbd "C-x C-a")     'recentf-open-files)
+
+(global-set-key (kbd "C-M-<down>")  'shrink-window)
+(global-set-key (kbd "C-M-<up>")    'enlarge-window)
+(global-set-key (kbd "C-M-<right>") 'enlarge-window-horizontally)
+(global-set-key (kbd "C-M-<left>")  'shrink-window-horizontally)
+
+;; I should try to mod this so it can indent backward and indent even
+;; if the cursor is placed in the middle of a word.
+;; Follow the help for indent-relative-maybe to the lisp code for it.
+;;(global-set-key (kbd "C-<tab>")	'indent-relative-maybe)
+
+;; Why doesn't this work with C-M-x ? (I'm guessing M-x is special and
+;; interferes with the binding)
+                                        ;(global-set-key (kbd "C-A-x")  'eval-region-or-defun)
+;; 'x' is for 'execute'
+(global-set-key (kbd "C-x x")  'eval-region-or-defun)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Experimental keybindings for navigation
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;   i                 up
+;; j k l   is    left down right
+;; C modifier goes by character; M goes by word or paragraph.
+;;
+;; Next row is for editing:
+;;
+;; C-m - kill character backward  (index finger: think left)
+;; C-, - newline-and-indent       (middle finger: think down)
+;; C-. - kill character forward   (ring finger: think right)
+;; C-/ - undo                     (pinky finger: think ??)
+;;
+;; M-m - kill word backward
+;; M-, - kill current line
+;; M-. - kill word forward
+;; M-/ - dabbrev-expand (as usual)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; (setenv "ERGOEMACS_KEYBOARD_LAYOUT" "us") ; US layout
+;; (load "~/Emacs/ergoemacs-keybindings-5.3.4/ergoemacs-mode")
+;; (ergoemacs-mode t)
+
+;; (global-set-key (kbd "M-b") 'ido-switch-buffer)
+;; (global-set-key (kbd "M-B") 'ibuffer)
+;; (global-set-key (kbd "M-1") 'delete-other-windows)
+;; (global-set-key (kbd "M-3") 'split-window-horizontally)
+;; (global-set-key (kbd "M-2") 'split-window-vertically)
+;; (global-set-key (kbd "M-,") 'newline-and-indent)
+;; (global-set-key (kbd "M-<") 'open-line)
+;; (global-set-key (kbd "M-/") 'undo)
+;; (global-set-key (kbd "M-I") 'my-backward-lines)
+;; (global-set-key (kbd "M-K") 'my-forward-lines)
+;; (global-set-key (kbd "M-.") 'end-of-line)
+;; (global-set-key (kbd "M-m") 'beginning-of-line)
+;; (global-set-key (kbd "M-[") 'move-cursor-next-pane)
+;; (global-set-key (kbd "M-s") 'save-buffer)
+;; (global-set-key (kbd "M-w") 'kill-buffer)
+
+;; (global-set-key (kbd "C-a") 'recentf-open-files)
+;; (global-set-key (kbd "M-t") 'kill-line-backward)
+;; (global-unset-key (kbd "M-h"))
+;; (global-unset-key (kbd "M-H"))
+;; (global-unset-key (kbd "M-G"))
+;; (global-unset-key (kbd "M-3"))
+;; (global-unset-key (kbd "M-4"))
+;; (global-unset-key (kbd "M-$"))
+;;(global-set-key (kbd "M-/") 'undo)
+
+
+;; Not 100% sure if the keyword option here works
+(defun my-revert-buffer ()
+  (interactive)
+  (revert-buffer :ignore_auto nil))
+
+
+(defvar scroll-divisor 10)
+(defvar mega-scroll-divisor 2)
+
+(defun my-scroll-up ()
+  (interactive)
+  (scroll-up (max 1 (/ (window-height) scroll-divisor))))
+
+(defun my-mega-scroll-up ()
+  (interactive)
+  (scroll-up (max 1 (/ (window-height) mega-scroll-divisor))))
+
+(defun my-scroll-down ()
+  (interactive)
+  (scroll-down (max 1 (/ (window-height) scroll-divisor))))
+
+(defun my-mega-scroll-down ()
+  (interactive)
+  (scroll-down (max 1 (/ (window-height) mega-scroll-divisor))))
+
+(defun my-forward-lines ()
+  (interactive)
+  (forward-line 4))
+
+(defun my-backward-lines ()
+  (interactive)
+  (previous-line 4))
+
+(defun eval-region-or-defun ()
+  (interactive)
+  (if (and mark-active transient-mark-mode)
+      (call-interactively 'eval-region)
+    (call-interactively 'eval-defun)))
+
+(defun is-whitespace (char)
+  (or (eql char (aref " \t\n" 0))
+      (eql char (aref " \t\n" 1))
+      (eql char (aref " \t\n" 2))))
+
+(defun delete-forward-whitespace ()
+  (interactive)
+  (let ((orig-pos (point)))
+    (delete-region
+         orig-pos
+       (progn
+         (skip-chars-forward " \t")
+         (constrain-to-field nil orig-pos t)))))
+
+(defconst my-word-chars "[:alnum:]\"'")
+(defconst my-non-word-chars "^[:space:]\n[:alnum:]\"'")
+
+(defun my-kill-word ()
+  (interactive)
+  (kill-region (point) (my-forward-word)))
+
+(defun my-backward-kill-word ()
+  (interactive)
+  (kill-region (point) (my-backward-word) (point)))
+
+
+
+;; Havne't quite decided which behavior I like better. I do think having it set
+;; to 't is a little more flexible, because one can always use forward-char if
+;; one just wants to go forward one character.
+;;
+;; Of course since these functions are used in my kill functions, the same rules
+;; will apply there too.
+
+(defvar skip-prefixed 't
+"If true, will make my-forward-word and my-backward-word traverse
+over a word prefixed by a non-word-character as if it were one
+entity. E.g.
+
+   abc!-def-ghi -> abc-def!-ghi
+      ^ point             ^
+
+Because these functions are used in my kill-word functions, the
+same behavior will apply there.")
+
+(defun my-forward-word ()
+  (interactive)
+  (let ((c (char-after))
+        (cp (char-after (+ 1 (point)))))
+    (cond ((is-word-char c) (skip-chars-forward my-word-chars))
+          ((and skip-prefixed
+                (is-non-word-char c)
+                (is-word-char cp))
+           (forward-char)
+           (skip-chars-forward my-word-chars))
+          ((is-whitespace c) (skip-chars-forward "[:space:]\n"))
+          ('t (skip-chars-forward my-non-word-chars))))
+  (point))
+
+(defun my-backward-word ()
+  (interactive)
+  (let ((c (char-before))
+        (cp (char-before (- (point) 1))))
+    (cond ((is-word-char c) (skip-chars-backward my-word-chars))
+          ((and skip-prefixed
+                (is-non-word-char c)
+                (is-word-char cp))
+           (backward-char)
+           (skip-chars-backward my-word-chars))
+          ((is-whitespace c) (skip-chars-backward "[:space:]\n"))
+          ('t (skip-chars-backward my-non-word-chars))))
+  (point))
+
+(defun my-forward-whitespace ()
+  (interactive)
+  (if (is-whitespace (char-after))
+      (skip-chars-forward "[:space:]\n")
+    (skip-chars-forward "^[:space:]\n")))
+
+(defun my-backward-whitespace ()
+  (interactive)
+  (if (is-whitespace (char-before))
+      (skip-chars-backward "[:space:]\n")
+    (skip-chars-backward "^[:space:]\n")))
+
+
+(defun is-word-char (char)
+  (if (string-match (concat "[" my-word-chars "]")
+                    (char-to-string char))
+      't
+    nil))
+
+(defun is-non-word-char (char)
+  (if (or (string-match (concat "[" my-non-word-chars "]")
+                    (char-to-string char))
+          (eql (aref " " 0) char))
+      't
+    nil))
+
+(defun my-beginning-of-line ()
+  "Moves to the beginning of the line text if the point is not
+already there or at the beginning of the line. If it is, moves to
+the beginning of the line."
+  (interactive)
+  (let ((p (point)))
+    (beginning-of-line-text)
+    (if (eql p (point))
+        (beginning-of-line))))
+
+(defun insert-stars ()
+  (interactive)
+  (insert-to-end "*"))
+
+(defun insert-pounds ()
+  (interactive)
+  (insert-to-end "#"))
+
+(defun insert-spaces ()
+  (interactive)
+  (insert-to-end " "))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; imenu
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(global-font-lock-mode 1)
+
+(setq imenu-auto-rescan 1)
+(add-hook 'c-mode-hook 'imenu-add-menubar-index)
+(add-hook 'python-mode-hook 'imenu-add-menubar-index)
+(add-hook 'LaTeX-mode-hook 'imenu-add-menubar-index)
+(add-hook 'TeX-mode-hook 'imenu-add-menubar-index)
+(add-hook 'TeX-PDF-mode-hook 'imenu-add-menubar-index)
+(add-hook 'docTeX-PDF-mode-hook 'imenu-add-menubar-index)
+(add-hook 'f90-mode-hook 'imenu-add-menubar-index)
+(add-hook 'fortran-mode-hook 'imenu-add-menubar-index)
+(add-hook 'emacs-lisp-mode-hook 'imenu-add-menubar-index)
+(add-hook 'lisp-mode-hook 'imenu-add-menubar-index)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Autosave and backup files.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defvar backup-dir (expand-file-name "~/.emacs.d/backup/"))
+(defvar autosave-dir (expand-file-name "~/.emacs.d/autosave/"))
+(setq backup-directory-alist (list (cons ".*" backup-dir)))
+(setq auto-save-list-file-prefix autosave-dir)
+(setq auto-save-file-name-transforms `((".*" ,autosave-dir t)))
+(setq delete-old-versions t
+  kept-new-versions 6
+  kept-old-versions 2
+  version-control t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Common customizations
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq split-width-threshold most-positive-fixnum)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; TRAMP                                                                      ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; This allows Tramp to properly keep persistant connections with the same
+;; configuration as what I have in ~/.ssh/config
+(setq tramp-ssh-controlmaster-options
+      (concat
+       "-o ControlPath=" (expand-file-name ".ssh/master-%%r@%%h:%%p" "~")
+       " -o ControlMaster=auto -o ControlPersist=yes"))
+
+;; Don't use version control on files opened with TRAMP
+;; https://superuser.com/questions/341723/how-can-disable-emacs-vc-integration-on-mounted-volumes
+(setq vc-ignore-dir-regexp
+      (format "\\(%s\\)\\|\\(%s\\)"
+              vc-ignore-dir-regexp
+              tramp-file-name-regexp))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Faces
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Automatic emacs customizations                                             ;;
+;; NOTE: Always delete the custom-set-faces form Emacs puts in here.          ;;
+;; Leave the custom-set-variables one though.                                 ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(LaTeX-command "pdflatex")
+ '(blink-cursor-mode nil)
+ '(column-number-mode t)
+ '(compilation-always-kill t)
+ '(compilation-context-lines 4)
+ '(compilation-scroll-output (quote first-error))
+ '(compilation-search-path (quote (nil "src")))
+ '(ecb-options-version "2.40")
+ '(enable-recursive-minibuffers t)
+ '(f90-beginning-ampersand nil)
+ '(f90-smart-end (quote no-blink))
+ '(gnuplot-program "/usr/local/bin/gnuplot" t)
+ '(grep-command "grep  -nH -ie ")
+ '(grep-find-command nil)
+ '(grep-highlight-matches (quote always))
+ '(grep-template "grep <X> <C> -nH -ie <R> <F>")
+ '(ido-enable-flex-matching nil)
+ '(ido-ignore-files
+   (quote
+    ("\\`CVS/" "\\`#" "\\`.#" "\\`\\.\\./" "\\`\\./" "\\`.*\\.mod$" "\\`\\.DS_store/")))
+ '(ido-mode (quote buffer) nil (ido))
+ '(ido-show-dot-for-dired t)
+ '(indent-tabs-mode nil)
+ '(inhibit-default-init t)
+ '(inhibit-startup-screen t)
+ '(latex-run-command "pdflatex")
+ '(minibuffer-depth-indicate-mode t)
+ '(modelinepos-column-limit 80)
+ '(package-selected-packages
+   (quote
+    (julia-repl julia-shell lsp-fortran lsp-python projectile magit lsp-mode gnuplot-mode wolfram-mode htmlize gandalf-theme gnuplot ace-window modeline-posn flappymacs julia-mode paradox nyan-mode exec-path-from-shell)))
+ '(paradox-automatically-star t)
+ '(scroll-conservatively 0)
+ '(scroll-down-aggressively 0.25)
+ '(scroll-margin 4)
+ '(scroll-step 0)
+ '(scroll-up-aggressively 0.7)
+ '(search-default-mode t)
+ '(show-paren-mode t)
+ '(size-indication-mode t)
+ '(standard-indent 2)
+ '(tags-revert-without-query t)
+ '(tool-bar-mode nil)
+ '(wolfram-indent 2)
+ '(xref-prompt-for-identifier t)
+ '(xterm-mouse-mode t))
+
+(when window-system
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :stipple nil :background "#f5f6f7" :foreground "#3b3e45" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 100 :width normal :foundry "DAMA" :family "Menlo"))))
+ '(font-lock-builtin-face ((((class color) (min-colors 88) (background light)) (:underline t))))
+ '(font-lock-comment-delimiter-face ((default (:inherit font-lock-comment-face)) (((class color) (min-colors 16)) nil)))
+ '(font-lock-comment-face ((t (:foreground "#830000" :slant italic))))
+ '(font-lock-constant-face ((((class color) (min-colors 88) (background light)) (:foreground "#0F0051"))))
+ '(font-lock-doc-face ((t (:inherit font-lock-string-face))))
+ '(font-lock-function-name-face ((((class color) (min-colors 88) (background light)) :box nil :weight bold)))
+ '(font-lock-keyword-face ((t (:foreground "#0F0051" :weight bold))))
+ '(font-lock-negation-char-face ((t (:foreground "DarkRed"))))
+ '(font-lock-regexp-grouping-backslash ((t (:inherit bold :foreground "DarkCyan"))))
+ '(font-lock-regexp-grouping-construct ((t (:inherit bold :foreground "DarkCyan"))))
+ '(font-lock-string-face ((((class color) (min-colors 88) (background light)) (:foreground "dark slate grey"))))
+ '(font-lock-type-face ((((class color) (min-colors 88) (background light)) (:underline "grey50" :weight bold))))
+ '(font-lock-variable-name-face ((((class color) (min-colors 88) (background light)) (:foreground "#1E3149"))))
+ '(mode-line ((t (:background "#f6f6f6" :foreground "grey10" :box (:line-width 1 :color "grey50")))))
+ '(mode-line-inactive ((default (:inherit mode-line :foreground "grey30")) (((class color) (min-colors 88) (background light)) nil)))
+ '(org-level-1 ((t (:weight bold :height 1.2))))
+ '(org-level-2 ((t (:weight bold :height 1.1))))
+ '(org-level-3 ((t (:foreground "blue" :weight bold))))
+ '(org-level-4 ((t (:foreground "blue" :slant italic))))
+ '(ps-footer-font-size (quote (10 . 10)))
+ '(ps-header-font-size (quote (10 . 10)))
+ '(ps-header-title-font-size (quote (10 . 10)))
+ '(region ((((class color) (min-colors 88) (background light)) (:background "#BDD5FC"))))
+ '(sh-heredoc ((((class color) (background light)) (:foreground "dark slate gray")))))
+)
+
+(if (eq system-type 'darwin)
+    (custom-set-faces '(default ((t (:family "Menlo" :height 130))))) ; OS X
+  (custom-set-faces '(default ((t (:family "Menlo" :height 100))))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :stipple nil :background "#f5f6f7" :foreground "#3b3e45" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 100 :width normal :foundry "DAMA" :family "Menlo"))))
+ '(font-lock-builtin-face ((((class color) (min-colors 88) (background light)) (:underline t))))
+ '(font-lock-comment-delimiter-face ((default (:inherit font-lock-comment-face)) (((class color) (min-colors 16)) nil)))
+ '(font-lock-comment-face ((t (:foreground "#830000" :slant italic))))
+ '(font-lock-constant-face ((((class color) (min-colors 88) (background light)) (:foreground "#0F0051"))))
+ '(font-lock-doc-face ((t (:inherit font-lock-string-face))))
+ '(font-lock-function-name-face ((((class color) (min-colors 88) (background light)) :box nil :weight bold)))
+ '(font-lock-keyword-face ((t (:foreground "#0F0051" :weight bold))))
+ '(font-lock-negation-char-face ((t (:foreground "DarkRed"))))
+ '(font-lock-regexp-grouping-backslash ((t (:inherit bold :foreground "DarkCyan"))))
+ '(font-lock-regexp-grouping-construct ((t (:inherit bold :foreground "DarkCyan"))))
+ '(font-lock-string-face ((((class color) (min-colors 88) (background light)) (:foreground "dark slate grey"))))
+ '(font-lock-type-face ((((class color) (min-colors 88) (background light)) (:underline "grey50" :weight bold))))
+ '(font-lock-variable-name-face ((((class color) (min-colors 88) (background light)) (:foreground "#1E3149"))))
+ '(mode-line ((t (:background "#f6f6f6" :foreground "grey10" :box (:line-width 1 :color "grey50")))))
+ '(mode-line-inactive ((default (:inherit mode-line :foreground "grey30")) (((class color) (min-colors 88) (background light)) nil)))
+ '(org-level-1 ((t (:weight bold :height 1.2))))
+ '(org-level-2 ((t (:weight bold :height 1.1))))
+ '(org-level-3 ((t (:foreground "blue" :weight bold))))
+ '(org-level-4 ((t (:foreground "blue" :slant italic))))
+ '(ps-footer-font-size (quote (10 . 10)))
+ '(ps-header-font-size (quote (10 . 10)))
+ '(ps-header-title-font-size (quote (10 . 10)))
+ '(region ((((class color) (min-colors 88) (background light)) (:background "#BDD5FC"))))
+ '(sh-heredoc ((((class color) (background light)) (:foreground "dark slate gray")))))

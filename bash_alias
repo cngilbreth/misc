@@ -1,0 +1,68 @@
+#-*- mode: sh -*-
+# the following make it very convenient to create aliases
+# for getting to the current directory and to make
+# an alias for one of the commands you recently entered.
+#
+# acd  - alias current directory
+# adir - see the aliases for switching directories
+# alc  - alias last commands into .al - the local alias file
+# galc - alias last commands into $HOME/.bash_alias - the global alias file
+# al   - edit the local aliases (in the current directory)
+# ga   - edit the global aliases
+#
+alias alc='history|tail -80>~/.tmpbashalias; alc;   [ -f ./.al ] && . ./.al'
+alias galc='history|tail -80>~/.tmpbashalias; alc g; . ~/.bash_alias'
+alias acd='~/Bin/acd; . ~/.bash_alias'
+alias ga='${FCEDIT:-${EDITOR:-emacs -nw}} ~/.bash_alias; . ~/.bash_alias'
+alias al='${FCEDIT:-${EDITOR:-emacs -nw}} .al;[ -f ./.al ] && . ./.al'
+
+alias xopen='exo-open'       # like 'open' on a mac
+alias f='exo-open'
+alias es='sudo emacs -nw'    # For editing system files
+
+alias du0='du -h --max-depth 0 ./'
+alias du1='du -h --max-depth 1 ./'
+alias du2='du -h --max-depth 2 ./'
+
+alias ls='ls -t'
+alias lhth='ls -lht | head -n 20'
+alias lht='ls -lht'
+
+# UTILITIES
+
+# If you want to use the real rm, use /bin/rm
+#alias rm="${HOME}/bin/trash.py"
+alias del="${HOME}/bin/trash.py"
+alias mv="mv -i"
+alias cp="cp -i"
+
+killgrep()
+{
+    kill `ps aux | grep $1 | awk '{print $2}' | tr '\n' ' '`
+}
+
+alias h='history'
+
+# Extended regular expressions in sed and grep
+#alias sed='sed -r'  # Doesn't work on OS X!
+alias grep='grep -E'
+alias files='nautilus'
+
+#alias ec="emacsclient -c -n -a ''"
+alias ec="emacs"
+#alias et="emacsclient -c -a '' -nw"
+alias et="emacs -nw"
+
+alias journal='emacs -nw ~/Documents/Happiness/src/Journal.txt'
+alias j='journal'
+alias erk='emacs -nw ~/Documents/erk.txt'
+alias food='emacs -nw ~/Documents/food.txt'
+alias g='emacs -nw ~/Documents/Happiness/src/GoodThings.txt'
+alias goals='emacs -nw ~/Documents/Happiness/src/Goals.txt'
+alias gen='emacs -nw ~/Documents/Happiness/src/Generosity.txt'
+alias pu='emacs -nw ~/Documents/Happiness/src/Pickup.org'
+alias hp='emacs -nw ~/Documents/Happiness/src/Happiness2.tex'
+
+
+qproj_long=/Users/chris/Research/Papers/qproj_long
+alias qproj_long="cd /Users/chris/Research/Papers/qproj_long; pwd;. ./.al"
